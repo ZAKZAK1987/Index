@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#007aff">
+    <title>Rapport Chantier Pro</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlJhcHBvcnQgQ2hhbnRpZXIgUHJvIiwKICAic2hvcnRfbmFtZSI6ICJDaGFudGllclBybyIsCiAgInN0YXJ0X3VybCI6ICIvIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZmZmZmZmIiwKICAidGhlbWVfY29sb3IiOiAiIzAwN2FmZiIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0Igp9">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary: #007aff;
+            --secondary: #5856d6;
+            --success: #34c759;
+            --danger: #ff3b30;
+            --warning: #ff9500;
+            --background: #f2f2f7;
+            --surface: #ffffff;
+            --text-primary: #000000;
+            --text-secondary: #6c6c70;
+            --border: #c6c6c8;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px 20px;
+            margin: -20px -20px 20px -20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--background);
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            background: #0051d5;
+            transform: scale(0.98);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-block {
+            width: 100%;
+            display: block;
+        }
+        
+        .remarque-item {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+        
+        .remarque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .remarque-number {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .photo-box {
+            background: var(--background);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 30px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .photo-box:active {
+            background: white;
+            border-color: var(--primary);
+        }
+        
+        .photo-box.has-image {
+            padding: 5px;
+            border-style: solid;
+        }
+        
+        .photo-box img {
+            width: 100%;
+            height: auto;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .photo-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .photo-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .fixed-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            padding: 15px 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* iOS Specific Fixes */
+        input[type="date"] {
+            min-height: 44px;
+        }
+        
+        @supports (-webkit-touch-callout: none) {
+            input, textarea, select {
+                font-size: 16px !important;
+            }
+        }
+        
+        @media (max-width: 390px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Rapport Chantier Pro</h1>
+            <p>Suivi des remarques</p>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🏗️ Informations du Projet</h2>
+            <div class="form-group">
+                <label>Nom du Chantier</label>
+                <input type="text" id="chantier" class="form-control" placeholder="Ex: Construction Maison Dupont">
+            </div>
+            <div class="form-group">
+                <label>Adresse</label>
+                <input type="text" id="adresse" class="form-control" placeholder="Ex: 123 Rue de la Paix">
+            </div>
+            <div class="form-group">
+                <label>Maître d'Ouvrage</label>
+                <input type="text" id="maitre-ouvrage" class="form-control" placeholder="Nom du client">
+            </div>
+            <div class="form-group">
+                <label>Maître d'Œuvre</label>
+                <input type="text" id="maitre-oeuvre" class="form-control" placeholder="Votre nom/entreprise">
+            </div>
+            <div class="form-group">
+                <label>Date de Visite</label>
+                <input type="date" id="date-visite" class="form-control">
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📝 Remarques et Tâches</h2>
+            <button id="add-remarque-btn" class="btn btn-primary btn-block">
+                ➕ Nouvelle Remarque
+            </button>
+            <div id="remarques-container" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+    
+    <div class="fixed-bottom">
+        <button id="generate-pdf-btn" class="btn btn-success btn-block">
+            <span id="pdf-text">📄 Créer le PDF</span>
+            <span class="loading hidden" id="pdf-loading"></span>
+        </button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Variables globales
+        let remarqueCount = 0;
+        const remarquesData = {};
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Date du jour
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date-visite').value = today;
+            
+            // Event listeners avec addEventListener pour iOS
+            document.getElementById('add-remarque-btn').addEventListener('click', addRemarque);
+            document.getElementById('generate-pdf-btn').addEventListener('click', generatePDF);
+            
+            // Ajouter une première remarque
+            addRemarque();
+        });
+        
+        function addRemarque() {
+            remarqueCount++;
+            const container = document.getElementById('remarques-container');
+            
+            const remarqueDiv = document.createElement('div');
+            remarqueDiv.className = 'remarque-item';
+            remarqueDiv.id = 'remarque-' + remarqueCount;
+            
+            remarqueDiv.innerHTML = `
+                <div class="remarque-header">
+                    <span class="remarque-number">Remarque #${remarqueCount}</span>
+                    <button class="btn btn-danger" data-remarque="${remarqueCount}">🗑️ Supprimer</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="desc-${remarqueCount}" class="form-control" placeholder="Décrivez la remarque..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Localisation</label>
+                    <input type="text" id="loc-${remarqueCount}" class="form-control" placeholder="Ex: RDC - Cuisine">
+                </div>
+                
+                <div class="form-group">
+                    <label>Entreprise</label>
+                    <input type="text" id="ent-${remarqueCount}" class="form-control" placeholder="Ex: Entreprise Martin">
+                </div>
+                
+                <div class="form-group">
+                    <label>Tâche</label>
+                    <input type="text" id="tache-${remarqueCount}" class="form-control" placeholder="Ex: Réparer fissure">
+                </div>
+                
+                <div class="form-group">
+                    <label>À faire pour le</label>
+                    <input type="date" id="date-limite-${remarqueCount}" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label>Fait le</label>
+                    <input type="date" id="date-fait-${remarqueCount}" class="form-control">
+                </div>
+                
+                <div class="photo-grid">
+                    <div class="photo-box" data-remarque="${remarqueCount}" data-photo="1">
+                        <div id="photo-1-${remarqueCount}">
+                            <div class="photo-label">📸 Photo 1</div>
+                            <div class="photo-hint">Toucher pour ajouter</div>
+                        </div>
+                        <input type="file" id="file-1-${remarqueCount}" accept="image/*" capture="environment" style="display: none;">
+                    </div>
+                    
+                    <div class="photo-box" data-remarque="${remarqueCount}" data-photo="2">
+                        <div id="photo-2-${remarqueCount}">
+                            <div class="photo-label">📸 Photo 2</div>
+                            <div class="photo-hint">Toucher pour ajouter</div>
+                        </div>
+                        <input type="file" id="file-2-${remarqueCount}" accept="image/*" capture="environment" style="display: none;">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(remarqueDiv);
+            
+            // Initialiser les données
+            remarquesData[remarqueCount] = {
+                id: remarqueCount,
+                photo1: null,
+                photo2: null
+            };
+            
+            // Event listeners pour cette remarque
+            const deleteBtn = remarqueDiv.querySelector('.btn-danger');
+            deleteBtn.addEventListener('click', function() {
+                removeRemarque(this.getAttribute('data-remarque'));
+            });
+            
+            // Photo boxes
+            const photoBoxes = remarqueDiv.querySelectorAll('.photo-box');
+            photoBoxes.forEach(box => {
+                box.addEventListener('click', function() {
+                    const remarqueId = this.getAttribute('data-remarque');
+                    const photoNum = this.getAttribute('data-photo');
+                    document.getElementById('file-' + photoNum + '-' + remarqueId).click();
+                });
+            });
+            
+            // File inputs
+            const fileInputs = remarqueDiv.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', function(e) {
+                    const remarqueId = parseInt(input.id.split('-')[2]);
+                    const photoNum = parseInt(input.id.split('-')[1]);
+                    handlePhotoUpload(remarqueId, photoNum, e);
+                });
+            });
+        }
+        
+        function removeRemarque(id) {
+            if (confirm('Supprimer cette remarque ?')) {
+                const element = document.getElementById('remarque-' + id);
+                if (element) {
+                    element.remove();
+                    delete remarquesData[id];
+                }
+            }
+        }
+        
+        function compressImage(file, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > maxWidth) {
+                            height = (maxWidth / width) * height;
+                            width = maxWidth;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve(dataUrl);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        async function handlePhotoUpload(remarqueId, photoNum, event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const photoDiv = document.getElementById('photo-' + photoNum + '-' + remarqueId);
+                photoDiv.innerHTML = '<div class="loading"></div>';
+                
+                try {
+                    const compressed = await compressImage(file, 800, 0.7);
+                    photoDiv.innerHTML = '<img src="' + compressed + '" alt="Photo">';
+                    photoDiv.parentElement.classList.add('has-image');
+                    
+                    remarquesData[remarqueId]['photo' + photoNum] = compressed;
+                } catch (error) {
+                    photoDiv.innerHTML = '<div class="photo-label">❌ Erreur</div>';
+                }
+            }
+        }
+        
+        function generatePDF() {
+            const pdfText = document.getElementById('pdf-text');
+            const pdfLoading = document.getElementById('pdf-loading');
+            const generateBtn = document.getElementById('generate-pdf-btn');
+            
+            pdfText.textContent = 'Génération...';
+            pdfLoading.classList.remove('hidden');
+            generateBtn.disabled = true;
+            
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    
+                    // Configuration
+                    const primaryColor = [0, 122, 255];
+                    const textColor = [0, 0, 0];
+                    const grayColor = [108, 108, 112];
+                    
+                    // En-tête
+                    pdf.setFillColor(...primaryColor);
+                    pdf.rect(0, 0, 210, 40, 'F');
+                    
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(24);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Rapport de Visite de Chantier', 105, 20, { align: 'center' });
+                    pdf.setFontSize(12);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text('Document généré le ' + new Date().toLocaleDateString('fr-FR'), 105, 30, { align: 'center' });
+                    
+                    // Informations projet
+                    let yPos = 55;
+                    pdf.setTextColor(...textColor);
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Informations du Projet', 20, yPos);
+                    
+                    yPos += 10;
+                    pdf.setFontSize(11);
+                    
+                    const infos = [
+                        { label: 'Chantier:', value: document.getElementById('chantier').value || 'Non renseigné' },
+                        { label: 'Adresse:', value: document.getElementById('adresse').value || 'Non renseigné' },
+                        { label: 'Maître d\'ouvrage:', value: document.getElementById('maitre-ouvrage').value || 'Non renseigné' },
+                        { label: 'Maître d\'œuvre:', value: document.getElementById('maitre-oeuvre').value || 'Non renseigné' },
+                        { label: 'Date de visite:', value: formatDate(document.getElementById('date-visite').value) || 'Non renseigné' }
+                    ];
+                    
+                    infos.forEach(info => {
+                        pdf.setFont(undefined, 'normal');
+                        pdf.setTextColor(...grayColor);
+                        pdf.text(info.label, 20, yPos);
+                        pdf.setTextColor(...textColor);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text(info.value, 60, yPos);
+                        yPos += 7;
+                    });
+                    
+                    // Remarques
+                    yPos += 10;
+                    pdf.setTextColor(...textColor);
+                    pdf.setFontSize(16);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('Remarques et Tâches', 20, yPos);
+                    
+                    yPos += 10;
+                    
+                    // Parcourir les remarques
+                    for (let i = 1; i <= remarqueCount; i++) {
+                        if (!document.getElementById('remarque-' + i)) continue;
+                        
+                        // Vérifier l'espace disponible
+                        if (yPos > 240) {
+                            pdf.addPage();
+                            yPos = 20;
+                        }
+                        
+                        // En-tête remarque
+                        pdf.setFillColor(...primaryColor);
+                        pdf.roundedRect(20, yPos - 6, 170, 8, 3, 3, 'F');
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.setFontSize(11);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text('Remarque #' + i, 25, yPos);
+                        
+                        yPos += 10;
+                        
+                        // Contenu
+                        pdf.setTextColor(...textColor);
+                        pdf.setFont(undefined, 'normal');
+                        pdf.setFontSize(10);
+                        
+                        const desc = document.getElementById('desc-' + i).value || 'Aucune description';
+                        const lines = pdf.splitTextToSize(desc, 170);
+                        pdf.text(lines, 20, yPos);
+                        yPos += lines.length * 5 + 5;
+                        
+                        // Détails
+                        const details = [
+                            { label: 'Localisation:', value: document.getElementById('loc-' + i).value },
+                            { label: 'Entreprise:', value: document.getElementById('ent-' + i).value },
+                            { label: 'Tâche:', value: document.getElementById('tache-' + i).value },
+                            { label: 'À faire pour:', value: formatDate(document.getElementById('date-limite-' + i).value) },
+                            { label: 'Fait le:', value: formatDate(document.getElementById('date-fait-' + i).value) }
+                        ];
+                        
+                        details.forEach(detail => {
+                            if (detail.value) {
+                                pdf.setFont(undefined, 'normal');
+                                pdf.setTextColor(...grayColor);
+                                pdf.text(detail.label, 25, yPos);
+                                pdf.setTextColor(...textColor);
+                                pdf.text(detail.value, 55, yPos);
+                                yPos += 5;
+                            }
+                        });
+                        
+                        // Photos
+                        if (remarquesData[i] && (remarquesData[i].photo1 || remarquesData[i].photo2)) {
+                            yPos += 5;
+                            if (yPos > 200) {
+                                pdf.addPage();
+                                yPos = 20;
+                            }
+                            
+                            let xPos = 25;
+                            if (remarquesData[i].photo1) {
+                                try {
+                                    pdf.addImage(remarquesData[i].photo1, 'JPEG', xPos, yPos, 70, 50);
+                                    xPos += 75;
+                                } catch (e) {
+                                    console.error('Erreur photo 1:', e);
+                                }
+                            }
+                            
+                            if (remarquesData[i].photo2) {
+                                try {
+                                    pdf.addImage(remarquesData[i].photo2, 'JPEG', xPos, yPos, 70, 50);
+                                } catch (e) {
+                                    console.error('Erreur photo 2:', e);
+                                }
+                            }
+                            
+                            yPos += 55;
+                        }
+                        
+                        yPos += 10;
+                    }
+                    
+                    // Sauvegarder
+                    const fileName = 'Rapport_' + (document.getElementById('chantier').value || 'Chantier') + '_' + new Date().toISOString().split('T')[0] + '.pdf';
+                    pdf.save(fileName);
+                    
+                    pdfText.textContent = '📄 Créer le PDF';
+                    pdfLoading.classList.add('hidden');
+                    generateBtn.disabled = false;
+                    
+                } catch (error) {
+                    console.error('Erreur PDF:', error);
+                    alert('Erreur lors de la génération du PDF');
+                    pdfText.textContent = '📄 Créer le PDF';
+                    pdfLoading.classList.add('hidden');
+                    generateBtn.disabled = false;
+                }
+            }, 100);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('fr-FR');
+        }
+        
+        // Service Worker pour PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",function(e){});');
+        }
+    </script>
+</body>
+</html>
