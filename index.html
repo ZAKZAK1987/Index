@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Visite Chantier - Maître d'Œuvre</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.8.1/dist/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0 1rem;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            color: #2563eb;
+        }
+
+        .nav-btn.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        /* Main content */
+        .main {
+            flex: 1;
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+        }
+
+        .btn-success {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .btn-success:hover {
+            background: #a7f3d0;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Visit list */
+        .visit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .visit-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #2563eb;
+        }
+
+        .visit-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .visit-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .visit-date {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .visit-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .visit-info {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .visit-info p {
+            margin-bottom: 0.25rem;
+        }
+
+        .visit-entreprises {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .entreprise-tag {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* Dynamic fields */
+        .dynamic-field {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .dynamic-field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+        }
+
+        /* Photo upload */
+        .photo-upload {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .photo-upload:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .photo-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .photo-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .photo-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .main {
+                padding: 1rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-input {
+                min-width: 100%;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1f2937;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Entreprises page */
+        .entreprise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .entreprise-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .entreprise-info {
+            flex: 1;
+        }
+
+        .entreprise-name {
+            font-weight: 600;
+        }
+
+        .entreprise-corps {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Utilitaires de stockage
+        const Storage = {
+            get: (key) => {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            },
+            set: (key, value) => {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        // Données initiales
+        const initializeData = () => {
+            if (!Storage.get('visites')) {
+                Storage.set('visites', []);
+            }
+            if (!Storage.get('entreprises')) {
+                Storage.set('entreprises', [
+                    { id: '1', nom: 'Bouygues', corpsEtat: 'Gros œuvre' },
+                    { id: '2', nom: 'Dalkia', corpsEtat: 'CVC' },
+                    { id: '3', nom: 'Spie', corpsEtat: 'Électricité' },
+                    { id: '4', nom: 'Vinci', corpsEtat: 'Plomberie' }
+                ]);
+            }
+            if (!Storage.get('parametres')) {
+                Storage.set('parametres', {
+                    nomChantier: 'Mon Chantier',
+                    adresseChantier: '',
+                    logoUrl: ''
+                });
+            }
+        };
+
+        // Composant Toast
+        const Toast = ({ message, onClose }) => {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 3000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+
+            return <div className="toast">{message}</div>;
+        };
+
+        // Composant principal
+        const App = () => {
+            const [currentPage, setCurrentPage] = useState('dashboard');
+            const [visites, setVisites] = useState([]);
+            const [entreprises, setEntreprises] = useState([]);
+            const [parametres, setParametres] = useState({});
+            const [toast, setToast] = useState(null);
+            const [selectedVisite, setSelectedVisite] = useState(null);
+            const [isEditing, setIsEditing] = useState(false);
+
+            useEffect(() => {
+                initializeData();
+                setVisites(Storage.get('visites') || []);
+                setEntreprises(Storage.get('entreprises') || []);
+                setParametres(Storage.get('parametres') || {});
+            }, []);
+
+            const showToast = (message) => {
+                setToast(message);
+            };
+
+            const saveVisite = (visite) => {
+                let newVisites;
+                if (visite.id) {
+                    newVisites = visites.map(v => v.id === visite.id ? visite : v);
+                } else {
+                    visite.id = Date.now().toString();
+                    visite.createdAt = new Date().toISOString();
+                    newVisites = [...visites, visite];
+                }
+                setVisites(newVisites);
+                Storage.set('visites', newVisites);
+                showToast('Visite enregistrée avec succès');
+                setCurrentPage('dashboard');
+                setSelectedVisite(null);
+                setIsEditing(false);
+            };
+
+            const deleteVisite = (id) => {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette visite ?')) {
+                    const newVisites = visites.filter(v => v.id !== id);
+                    setVisites(newVisites);
+                    Storage.set('visites', newVisites);
+                    showToast('Visite supprimée');
+                }
+            };
+
+            const saveEntreprise = (entreprise) => {
+                let newEntreprises;
+                if (entreprise.id) {
+                    newEntreprises = entreprises.map(e => e.id === entreprise.id ? entreprise : e);
+                } else {
+                    entreprise.id = Date.now().toString();
+                    newEntreprises = [...entreprises, entreprise];
+                }
+                setEntreprises(newEntreprises);
+                Storage.set('entreprises', newEntreprises);
+                showToast('Entreprise enregistrée');
+            };
+
+            const deleteEntreprise = (id) => {
+                if (confirm('Supprimer cette entreprise ?')) {
+                    const newEntreprises = entreprises.filter(e => e.id !== id);
+                    setEntreprises(newEntreprises);
+                    Storage.set('entreprises', newEntreprises);
+                    showToast('Entreprise supprimée');
+                }
+            };
+
+            const saveParametres = (newParams) => {
+                setParametres(newParams);
+                Storage.set('parametres', newParams);
+                showToast('Paramètres enregistrés');
+            };
+
+            const openVisite = (visite) => {
+                setSelectedVisite(visite);
+                setIsEditing(true);
+                setCurrentPage('form');
+            };
+
+            const newVisite = () => {
+                setSelectedVisite(null);
+                setIsEditing(false);
+                setCurrentPage('form');
+            };
+
+            return (
+                <div className="app">
+                    <header className="header">
+                        <div className="header-content">
+                            <div className="logo">
+                                <span className="logo-icon">🏗️</span>
+                                <span>Visite Chantier</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <nav className="nav">
+                        <div className="nav-content">
+                            <button
+                                className={`nav-btn ${currentPage === 'dashboard' ? 'active' : ''}`}
+                                onClick={() => setCurrentPage('dashboard')}
+                            >
+                                📋 Visites
+                            </button>
+                            <button
+                                className={`nav-btn ${currentPage === 'entreprises' ? 'active' : ''}`}
+                                onClick={() => setCurrentPage('entreprises')}
+                            >
+                                🏢 Entreprises
+                            </button>
+                            <button
+                                className={`nav-btn ${currentPage === 'parametres' ? 'active' : ''}`}
+                                onClick={() => setCurrentPage('parametres')}
+                            >
+                                ⚙️ Paramètres
+                            </button>
+                        </div>
+                    </nav>
+
+                    <main className="main">
+                        {currentPage === 'dashboard' && (
+                            <Dashboard
+                                visites={visites}
+                                onNew={newVisite}
+                                onOpen={openVisite}
+                                onDelete={deleteVisite}
+                                parametres={parametres}
+                            />
+                        )}
+                        {currentPage === 'form' && (
+                            <VisiteForm
+                                visite={selectedVisite}
+                                entreprises={entreprises}
+                                parametres={parametres}
+                                onSave={saveVisite}
+                                onCancel={() => setCurrentPage('dashboard')}
+                            />
+                        )}
+                        {currentPage === 'entreprises' && (
+                            <EntreprisesPage
+                                entreprises={entreprises}
+                                onSave={saveEntreprise}
+                                onDelete={deleteEntreprise}
+                            />
+                        )}
+                        {currentPage === 'parametres' && (
+                            <ParametresPage
+                                parametres={parametres}
+                                onSave={saveParametres}
+                            />
+                        )}
+                    </main>
+
+                    {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+                </div>
+            );
+        };
+
+        // Dashboard
+        const Dashboard = ({ visites, onNew, onOpen, onDelete, parametres }) => {
+            const [filter, setFilter] = useState('');
+            const [sortBy, setSortBy] = useState('date');
+
+            const filteredVisites = visites
+                .filter(v => {
+                    const searchTerm = filter.toLowerCase();
+                    return v.maitreOuvrage?.toLowerCase().includes(searchTerm) ||
+                           v.maitreOeuvre?.toLowerCase().includes(searchTerm) ||
+                           v.entreprisesPresentes?.some(e => e.nom.toLowerCase().includes(searchTerm));
+                })
+                .sort((a, b) => {
+                    if (sortBy === 'date') {
+                        return new Date(b.date) - new Date(a.date);
+                    }
+                    return 0;
+                });
+
+            const today = new Date().toISOString().split('T')[0];
+            const visitesPassees = visites.filter(v => v.date < today).length;
+            const visitesFutures = visites.filter(v => v.date >= today).length;
+
+            return (
+                <div>
+                    <div className="stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-value">{visites.length}</div>
+                            <div className="stat-label">Total visites</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{visitesPassees}</div>
+                            <div className="stat-label">Visites passées</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-value">{visitesFutures}</div>
+                            <div className="stat-label">Visites à venir</div>
+                        </div>
+                    </div>
+
+                    <div className="card">
+                        <div className="card-header">
+                            <h2 className="card-title">Visites de chantier</h2>
+                            <button className="btn btn-primary" onClick={onNew}>
+                                ➕ Nouvelle visite
+                            </button>
+                        </div>
+
+                        <div className="filters">
+                            <input
+                                type="text"
+                                className="form-input filter-input"
+                                placeholder="Rechercher..."
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                            />
+                            <select
+                                className="form-select"
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                style={{ width: 'auto' }}
+                            >
+                                <option value="date">Trier par date</option>
+                            </select>
+                        </div>
+
+                        {filteredVisites.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">📋</div>
+                                <div className="empty-state-title">Aucune visite</div>
+                                <p>Créez votre première visite de chantier</p>
+                            </div>
+                        ) : (
+                            <div className="visit-list">
+                                {filteredVisites.map(visite => (
+                                    <div key={visite.id} className="visit-item" onClick={() => onOpen(visite)}>
+                                        <div className="visit-item-header">
+                                            <span className="visit-date">
+                                                {new Date(visite.date).toLocaleDateString('fr-FR', {
+                                                    weekday: 'long',
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                })}
+                                            </span>
+                                            <span className={`visit-status ${visite.date < today ? 'status-completed' : 'status-pending'}`}>
+                                                {visite.date < today ? 'Terminée' : 'À venir'}
+                                            </span>
+                                        </div>
+                                        <div className="visit-info">
+                                            <p><strong>MOA:</strong> {visite.maitreOuvrage || '-'}</p>
+                                            <p><strong>MOE:</strong> {visite.maitreOeuvre || '-'}</p>
+                                        </div>
+                                        {visite.entreprisesPresentes?.length > 0 && (
+                                            <div className="visit-entreprises">
+                                                {visite.entreprisesPresentes.map((e, i) => (
+                                                    <span key={i} className="entreprise-tag">{e.nom}</span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="actions" style={{ marginTop: '1rem' }} onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                className="btn btn-sm btn-success"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    generatePDF(visite, parametres);
+                                                }}
+                                            >
+                                                📄 PDF
+                                            </button>
+                                            <button
+                                                className="btn btn-sm btn-danger"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onDelete(visite.id);
+                                                }}
+                                            >
+                                                🗑️ Supprimer
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // Formulaire de visite
+        const VisiteForm = ({ visite, entreprises, parametres, onSave, onCancel }) => {
+            const [formData, setFormData] = useState({
+                date: visite?.date || new Date().toISOString().split('T')[0],
+                maitreOuvrage: visite?.maitreOuvrage || '',
+                maitreOeuvre: visite?.maitreOeuvre || '',
+                entreprisesPresentes: visite?.entreprisesPresentes || [],
+                observationsGenerales: visite?.observationsGenerales || '',
+                observationsEntreprises: visite?.observationsEntreprises || [],
+                decisions: visite?.decisions || '',
+                photos: visite?.photos || [],
+                id: visite?.id
+            });
+
+            const fileInputRef = useRef(null);
+
+            const handleChange = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const addEntreprisePresente = () => {
+                setFormData(prev => ({
+                    ...prev,
+                    entreprisesPresentes: [...prev.entreprisesPresentes, { nom: '', corpsEtat: '' }]
+                }));
+            };
+
+            const updateEntreprisePresente = (index, field, value) => {
+                const newEntreprises = [...formData.entreprisesPresentes];
+                newEntreprises[index] = { ...newEntreprises[index], [field]: value };
+                setFormData(prev => ({ ...prev, entreprisesPresentes: newEntreprises }));
+            };
+
+            const removeEntreprisePresente = (index) => {
+                setFormData(prev => ({
+                    ...prev,
+                    entreprisesPresentes: prev.entreprisesPresentes.filter((_, i) => i !== index)
+                }));
+            };
+
+            const addObservationEntreprise = () => {
+                setFormData(prev => ({
+                    ...prev,
+                    observationsEntreprises: [...prev.observationsEntreprises, { entreprise: '', remarque: '', photo: null }]
+                }));
+            };
+
+            const updateObservationEntreprise = (index, field, value) => {
+                const newObs = [...formData.observationsEntreprises];
+                newObs[index] = { ...newObs[index], [field]: value };
+                setFormData(prev => ({ ...prev, observationsEntreprises: newObs }));
+            };
+
+            const removeObservationEntreprise = (index) => {
+                setFormData(prev => ({
+                    ...prev,
+                    observationsEntreprises: prev.observationsEntreprises.filter((_, i) => i !== index)
+                }));
+            };
+
+            const handlePhotoUpload = (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        setFormData(prev => ({
+                            ...prev,
+                            photos: [...prev.photos, event.target.result]
+                        }));
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            const handleObsPhotoUpload = (index, e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        updateObservationEntreprise(index, 'photo', event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const removePhoto = (index) => {
+                setFormData(prev => ({
+                    ...prev,
+                    photos: prev.photos.filter((_, i) => i !== index)
+                }));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave(formData);
+            };
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <h2 className="card-title">
+                            {formData.id ? 'Modifier la visite' : 'Nouvelle visite'}
+                        </h2>
+                    </div>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="section">
+                            <h3 className="section-title">Informations générales</h3>
+
+                            <div className="grid-2">
+                                <div className="form-group">
+                                    <label className="form-label">Date de la visite *</label>
+                                    <input
+                                        type="date"
+                                        className="form-input"
+                                        value={formData.date}
+                                        onChange={(e) => handleChange('date', e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid-2">
+                                <div className="form-group">
+                                    <label className="form-label">Maître d'ouvrage</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder="Ex: Crédit Agricole Immobilier"
+                                        value={formData.maitreOuvrage}
+                                        onChange={(e) => handleChange('maitreOuvrage', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Maître d'œuvre</label>
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder="Ex: Pillar Building"
+                                        value={formData.maitreOeuvre}
+                                        onChange={(e) => handleChange('maitreOeuvre', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="section">
+                            <h3 className="section-title">Entreprises présentes</h3>
+
+                            {formData.entreprisesPresentes.map((ent, index) => (
+                                <div key={index} className="dynamic-field">
+                                    <div className="dynamic-field-header">
+                                        <strong>Entreprise {index + 1}</strong>
+                                        <button type="button" className="remove-btn" onClick={() => removeEntreprisePresente(index)}>
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <div className="grid-2">
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Nom de l'entreprise"
+                                            value={ent.nom}
+                                            onChange={(e) => updateEntreprisePresente(index, 'nom', e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Corps d'état"
+                                            value={ent.corpsEtat}
+                                            onChange={(e) => updateEntreprisePresente(index, 'corpsEtat', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+
+                            <button type="button" className="btn btn-secondary" onClick={addEntreprisePresente}>
+                                ➕ Ajouter une entreprise
+                            </button>
+                        </div>
+
+                        <div className="section">
+                            <h3 className="section-title">Observations générales</h3>
+                            <div className="form-group">
+                                <textarea
+                                    className="form-textarea"
+                                    placeholder="Observations générales sur la visite..."
+                                    value={formData.observationsGenerales}
+                                    onChange={(e) => handleChange('observationsGenerales', e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="section">
+                            <h3 className="section-title">Observations par entreprise</h3>
+
+                            {formData.observationsEntreprises.map((obs, index) => (
+                                <div key={index} className="dynamic-field">
+                                    <div className="dynamic-field-header">
+                                        <strong>Observation {index + 1}</strong>
+                                        <button type="button" className="remove-btn" onClick={() => removeObservationEntreprise(index)}>
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <div className="form-group">
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Entreprise concernée"
+                                            value={obs.entreprise}
+                                            onChange={(e) => updateObservationEntreprise(index, 'entreprise', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <textarea
+                                            className="form-textarea"
+                                            placeholder="Remarque..."
+                                            value={obs.remarque}
+                                            onChange={(e) => updateObservationEntreprise(index, 'remarque', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Photo (facultatif)</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleObsPhotoUpload(index, e)}
+                                        />
+                                        {obs.photo && (
+                                            <img src={obs.photo} alt="Preview" className="photo-thumb" style={{ marginTop: '0.5rem' }} />
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+
+                            <button type="button" className="btn btn-secondary" onClick={addObservationEntreprise}>
+                                ➕ Ajouter une observation
+                            </button>
+                        </div>
+
+                        <div className="section">
+                            <h3 className="section-title">Décisions / Actions à suivre</h3>
+                            <div className="form-group">
+                                <textarea
+                                    className="form-textarea"
+                                    placeholder="Décisions prises et actions à suivre..."
+                                    value={formData.decisions}
+                                    onChange={(e) => handleChange('decisions', e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="section">
+                            <h3 className="section-title">Photos générales</h3>
+                            <div
+                                className="photo-upload"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <div>📷 Cliquez pour ajouter des photos</div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    style={{ display: 'none' }}
+                                    onChange={handlePhotoUpload}
+                                />
+                            </div>
+                            {formData.photos.length > 0 && (
+                                <div className="photo-preview">
+                                    {formData.photos.map((photo, index) => (
+                                        <div key={index} className="photo-container">
+                                            <img src={photo} alt={`Photo ${index + 1}`} className="photo-thumb" />
+                                            <button
+                                                type="button"
+                                                className="photo-remove"
+                                                onClick={() => removePhoto(index)}
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="actions">
+                            <button type="submit" className="btn btn-primary">
+                                💾 Enregistrer
+                            </button>
+                            <button type="button" className="btn btn-success" onClick={() => {
+                                onSave(formData);
+                                setTimeout(() => generatePDF(formData, parametres), 100);
+                            }}>
+                                📄 Enregistrer et générer PDF
+                            </button>
+                            <button type="button" className="btn btn-secondary" onClick={onCancel}>
+                                Annuler
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            );
+        };
+
+        // Page Entreprises
+        const EntreprisesPage = ({ entreprises, onSave, onDelete }) => {
+            const [showModal, setShowModal] = useState(false);
+            const [editingEntreprise, setEditingEntreprise] = useState(null);
+            const [formData, setFormData] = useState({ nom: '', corpsEtat: '' });
+
+            const openModal = (entreprise = null) => {
+                setEditingEntreprise(entreprise);
+                setFormData(entreprise || { nom: '', corpsEtat: '' });
+                setShowModal(true);
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave({ ...formData, id: editingEntreprise?.id });
+                setShowModal(false);
+            };
+
+            return (
+                <div>
+                    <div className="card">
+                        <div className="card-header">
+                            <h2 className="card-title">Entreprises</h2>
+                            <button className="btn btn-primary" onClick={() => openModal()}>
+                                ➕ Nouvelle entreprise
+                            </button>
+                        </div>
+
+                        {entreprises.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">🏢</div>
+                                <div className="empty-state-title">Aucune entreprise</div>
+                                <p>Ajoutez vos entreprises pour les sélectionner rapidement</p>
+                            </div>
+                        ) : (
+                            <div className="entreprise-list">
+                                {entreprises.map(ent => (
+                                    <div key={ent.id} className="entreprise-item">
+                                        <div className="entreprise-info">
+                                            <div className="entreprise-name">{ent.nom}</div>
+                                            <div className="entreprise-corps">{ent.corpsEtat}</div>
+                                        </div>
+                                        <div className="actions">
+                                            <button className="btn btn-sm btn-secondary" onClick={() => openModal(ent)}>
+                                                ✏️
+                                            </button>
+                                            <button className="btn btn-sm btn-danger" onClick={() => onDelete(ent.id)}>
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {showModal && (
+                        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                            <div className="modal" onClick={e => e.stopPropagation()}>
+                                <div className="modal-header">
+                                    <h3 className="modal-title">
+                                        {editingEntreprise ? 'Modifier entreprise' : 'Nouvelle entreprise'}
+                                    </h3>
+                                    <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+                                </div>
+                                <form onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <label className="form-label">Nom de l'entreprise</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.nom}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, nom: e.target.value }))}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Corps d'état</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            value={formData.corpsEtat}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, corpsEtat: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div className="actions">
+                                        <button type="submit" className="btn btn-primary">Enregistrer</button>
+                                        <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                            Annuler
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Page Paramètres
+        const ParametresPage = ({ parametres, onSave }) => {
+            const [formData, setFormData] = useState(parametres);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSave(formData);
+            };
+
+            return (
+                <div className="card">
+                    <div className="card-header">
+                        <h2 className="card-title">Paramètres</h2>
+                    </div>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label className="form-label">Nom du chantier</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={formData.nomChantier || ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, nomChantier: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Adresse du chantier</label>
+                            <textarea
+                                className="form-textarea"
+                                value={formData.adresseChantier || ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, adresseChantier: e.target.value }))}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">URL du logo (pour PDF)</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="https://..."
+                                value={formData.logoUrl || ''}
+                                onChange={(e) => setFormData(prev => ({ ...prev, logoUrl: e.target.value }))}
+                            />
+                        </div>
+
+                        <button type="submit" className="btn btn-primary">
+                            💾 Enregistrer les paramètres
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        // Génération PDF
+        const generatePDF = (visite, parametres) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            let y = 20;
+
+            // En-tête
+            doc.setFillColor(37, 99, 235);
+            doc.rect(0, 0, pageWidth, 40, 'F');
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont(undefined, 'bold');
+            doc.text('COMPTE RENDU DE VISITE DE CHANTIER', pageWidth / 2, 25, { align: 'center' });
+
+            y = 50;
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'normal');
+
+            // Infos chantier
+            if (parametres.nomChantier) {
+                doc.setFont(undefined, 'bold');
+                doc.text(`Chantier: ${parametres.nomChantier}`, 15, y);
+                y += 7;
+            }
+            if (parametres.adresseChantier) {
+                doc.setFont(undefined, 'normal');
+                doc.text(`Adresse: ${parametres.adresseChantier}`, 15, y);
+                y += 7;
+            }
+
+            // Date
+            doc.setFont(undefined, 'bold');
+            const dateStr = new Date(visite.date).toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+            doc.text(`Date de la visite: ${dateStr}`, 15, y);
+            y += 15;
+
+            // Participants
+            doc.setFillColor(240, 240, 240);
+            doc.rect(10, y - 5, pageWidth - 20, 25, 'F');
+
+            doc.setFont(undefined, 'bold');
+            doc.text('PARTICIPANTS', 15, y + 3);
+            y += 10;
+
+            doc.setFont(undefined, 'normal');
+            doc.text(`Maître d'ouvrage: ${visite.maitreOuvrage || '-'}`, 15, y);
+            y += 6;
+            doc.text(`Maître d'œuvre: ${visite.maitreOeuvre || '-'}`, 15, y);
+            y += 15;
+
+            // Entreprises présentes
+            if (visite.entreprisesPresentes?.length > 0) {
+                doc.setFont(undefined, 'bold');
+                doc.text('ENTREPRISES PRÉSENTES', 15, y);
+                y += 8;
+
+                const entData = visite.entreprisesPresentes.map(e => [e.nom, e.corpsEtat]);
+                doc.autoTable({
+                    startY: y,
+                    head: [['Entreprise', 'Corps d\'état']],
+                    body: entData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [37, 99, 235] },
+                    margin: { left: 15, right: 15 }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            }
+
+            // Observations générales
+            if (visite.observationsGenerales) {
+                doc.setFont(undefined, 'bold');
+                doc.text('OBSERVATIONS GÉNÉRALES', 15, y);
+                y += 8;
+
+                doc.setFont(undefined, 'normal');
+                const obsLines = doc.splitTextToSize(visite.observationsGenerales, pageWidth - 30);
+                doc.text(obsLines, 15, y);
+                y += obsLines.length * 6 + 10;
+            }
+
+            // Observations par entreprise
+            if (visite.observationsEntreprises?.length > 0) {
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFont(undefined, 'bold');
+                doc.text('OBSERVATIONS PAR ENTREPRISE', 15, y);
+                y += 8;
+
+                const obsData = visite.observationsEntreprises.map(o => [o.entreprise, o.remarque]);
+                doc.autoTable({
+                    startY: y,
+                    head: [['Entreprise', 'Remarque']],
+                    body: obsData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [37, 99, 235] },
+                    margin: { left: 15, right: 15 },
+                    columnStyles: {
+                        1: { cellWidth: 'auto' }
+                    }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            }
+
+            // Décisions
+            if (visite.decisions) {
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFont(undefined, 'bold');
+                doc.text('DÉCISIONS / ACTIONS À SUIVRE', 15, y);
+                y += 8;
+
+                doc.setFont(undefined, 'normal');
+                const decLines = doc.splitTextToSize(visite.decisions, pageWidth - 30);
+                doc.text(decLines, 15, y);
+                y += decLines.length * 6 + 10;
+            }
+
+            // Zone signatures
+            if (y > 220) {
+                doc.addPage();
+                y = 20;
+            }
+
+            y = Math.max(y, 240);
+            doc.setDrawColor(200, 200, 200);
+            doc.line(15, y, 85, y);
+            doc.line(115, y, 195, y);
+
+            doc.setFontSize(10);
+            doc.text('Signature Maître d\'ouvrage', 15, y + 10);
+            doc.text('Signature Maître d\'œuvre', 115, y + 10);
+
+            // Pied de page
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Document généré le ${new Date().toLocaleDateString('fr-FR')}`, pageWidth / 2, 290, { align: 'center' });
+
+            // Télécharger
+            const fileName = `visite_${visite.date}_${parametres.nomChantier || 'chantier'}.pdf`
+                .replace(/\s+/g, '_')
+                .toLowerCase();
+            doc.save(fileName);
+        };
+
+        // Rendu
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
