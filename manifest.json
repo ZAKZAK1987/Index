@@ -1,0 +1,21 @@
+{
+  "name": "ÉCRILUXE - Gestion Librairie-Papeterie",
+  "short_name": "ÉCRILUXE",
+  "description": "Application de gestion pour librairie-papeterie - Ain Temouchent",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7fafc",
+  "theme_color": "#1a365d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["business", "finance"],
+  "lang": "fr",
+  "dir": "ltr"
+}
