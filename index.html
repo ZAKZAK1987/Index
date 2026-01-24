@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#d97706">
+    <title>Gestion de Chantier Pro</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Google Fonts - Style Claude -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #d97706;
+            --primary-light: #f59e0b;
+            --primary-dark: #b45309;
+            --secondary: #1f2937;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+
+        .nav-brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .nav-tab:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Container */
+        .main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Page Views */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: inherit;
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-lg {
+            padding: 14px 28px;
+            font-size: 16px;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        @media (max-width: 1024px) {
+            .grid-3, .grid-4 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-todo {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .badge-progress {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .badge-done {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-info {
+            background: var(--info-light);
+            color: var(--info);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--surface-hover);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            font-size: 14px;
+        }
+
+        .tag-remove:hover {
+            color: var(--danger);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card.todo .stat-value { color: var(--danger); }
+        .stat-card.progress .stat-value { color: var(--warning); }
+        .stat-card.done .stat-value { color: var(--success); }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-chip.todo.active { background: var(--danger); border-color: var(--danger); }
+        .filter-chip.progress.active { background: var(--warning); border-color: var(--warning); }
+        .filter-chip.done.active { background: var(--success); border-color: var(--success); }
+
+        /* Remarque Cards */
+        .remarque-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .remarque-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .remarque-card.status-todo {
+            border-left: 4px solid var(--danger);
+        }
+
+        .remarque-card.status-progress {
+            border-left: 4px solid var(--warning);
+        }
+
+        .remarque-card.status-done {
+            border-left: 4px solid var(--success);
+        }
+
+        .remarque-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .remarque-number {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .remarque-id {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .remarque-entreprise {
+            background: var(--info-light);
+            color: var(--info);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .remarque-body {
+            padding: 16px 20px;
+        }
+
+        .remarque-description {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .remarque-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .remarque-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .remarque-photos {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px 20px;
+            background: var(--background);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .photo-slot {
+            aspect-ratio: 1;
+            background: var(--surface);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-slot:hover {
+            border-color: var(--primary);
+            background: var(--surface-hover);
+        }
+
+        .photo-slot.has-photo {
+            border-style: solid;
+            border-color: var(--border);
+        }
+
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-slot-icon {
+            font-size: 24px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .photo-slot-text {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 24px;
+            height: 24px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .photo-slot:hover .photo-remove {
+            opacity: 1;
+        }
+
+        .remarque-actions {
+            padding: 12px 20px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Summary Table */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .summary-table th {
+            background: var(--background);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-table td {
+            font-size: 14px;
+        }
+
+        .summary-table .count {
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .summary-table .count.todo { color: var(--danger); }
+        .summary-table .count.progress { color: var(--warning); }
+        .summary-table .count.done { color: var(--success); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .modal-close:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-content {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 12px 0;
+                gap: 12px;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 4px;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .remarque-photos {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav, .filter-bar, .remarque-actions, .btn {
+                display: none !important;
+            }
+        }
+
+        /* Saved Reports List */
+        .report-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .report-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .report-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .report-info {
+            flex: 1;
+        }
+
+        .report-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .report-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Combobox with suggestions */
+        .combobox-wrapper {
+            position: relative;
+        }
+
+        .combobox-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            z-index: 50;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .combobox-suggestions.active {
+            display: block;
+        }
+
+        .combobox-option {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .combobox-option:hover {
+            background: var(--surface-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <div class="nav-brand-icon">🏗️</div>
+                <span>Gestion de Chantier</span>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-page="rapport">📋 Rapport</button>
+                <button class="nav-tab" data-page="config">⚙️ Configuration</button>
+                <button class="nav-tab" data-page="historique">📁 Historique</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Page Rapport -->
+        <div id="page-rapport" class="page active">
+            <!-- Chantier Info Card -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">🏢 Informations du chantier</h2>
+                    <button class="btn btn-secondary btn-sm" id="btn-select-chantier">Charger un chantier</button>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nom du chantier</label>
+                            <input type="text" id="chantier-nom" class="form-control" placeholder="Ex: Construction résidence...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Adresse</label>
+                            <input type="text" id="chantier-adresse" class="form-control" placeholder="Ex: 1-3T, Rue...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Maître d'ouvrage</label>
+                            <input type="text" id="chantier-mo" class="form-control" placeholder="Ex: ACCUEIL IMMO">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Maître d'œuvre exécution</label>
+                            <input type="text" id="chantier-moe" class="form-control" placeholder="Ex: CMC BUILDING">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date de la visite</label>
+                            <input type="date" id="date-visite" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card todo">
+                    <div class="stat-value" id="stat-todo">0</div>
+                    <div class="stat-label">À faire</div>
+                </div>
+                <div class="stat-card progress">
+                    <div class="stat-value" id="stat-progress">0</div>
+                    <div class="stat-label">En cours</div>
+                </div>
+                <div class="stat-card done">
+                    <div class="stat-value" id="stat-done">0</div>
+                    <div class="stat-label">Terminé</div>
+                </div>
+            </div>
+
+            <!-- Synthèse par entreprise -->
+            <div class="card" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">📊 Synthèse par entreprise</h2>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <table class="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Entreprise</th>
+                                <th style="text-align: center;">À faire</th>
+                                <th style="text-align: center;">En cours</th>
+                                <th style="text-align: center;">Terminé</th>
+                                <th style="text-align: center;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table-body">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Filters and Actions -->
+            <div class="filter-bar">
+                <span class="filter-label">Filtrer par statut :</span>
+                <button class="filter-chip todo active" data-filter="todo">🔴 À faire</button>
+                <button class="filter-chip progress active" data-filter="progress">🟠 En cours</button>
+                <button class="filter-chip done active" data-filter="done">🟢 Terminé</button>
+                <div style="flex: 1;"></div>
+                <button class="btn btn-primary" id="btn-add-remarque">➕ Nouvelle remarque</button>
+            </div>
+
+            <!-- Remarques List -->
+            <div id="remarques-container" class="grid">
+                <!-- Filled by JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">Aucune remarque pour le moment.<br>Cliquez sur "Nouvelle remarque" pour commencer.</div>
+            </div>
+
+            <!-- Fixed Bottom Actions -->
+            <div style="margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-success btn-lg" id="btn-generate-pdf">📄 Générer le PDF</button>
+                <button class="btn btn-primary btn-lg" id="btn-save-report">💾 Enregistrer le rapport</button>
+            </div>
+        </div>
+
+        <!-- Page Configuration -->
+        <div id="page-config" class="page">
+            <div class="grid grid-2">
+                <!-- Chantiers préenregistrés -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🏗️ Chantiers</h2>
+                        <button class="btn btn-primary btn-sm" id="btn-add-chantier-config">➕ Ajouter</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="chantiers-list" class="report-list">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entreprises -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🏢 Entreprises</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="new-entreprise" class="form-control" placeholder="Nom de l'entreprise...">
+                                <button class="btn btn-primary" id="btn-add-entreprise">➕</button>
+                            </div>
+                        </div>
+                        <div id="entreprises-tags" class="tag-list">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Niveaux/Étages -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🏠 Niveaux / Étages</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="new-niveau" class="form-control" placeholder="Ex: RDC, R+1, Sous-sol...">
+                                <button class="btn btn-primary" id="btn-add-niveau">➕</button>
+                            </div>
+                        </div>
+                        <div id="niveaux-tags" class="tag-list">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Localisations -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📍 Localisations</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="new-localisation" class="form-control" placeholder="Ex: Cuisine, Hall, Local transfo...">
+                                <button class="btn btn-primary" id="btn-add-localisation">➕</button>
+                            </div>
+                        </div>
+                        <div id="localisations-tags" class="tag-list">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Historique -->
+        <div id="page-historique" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📁 Rapports enregistrés</h2>
+                </div>
+                <div class="card-body">
+                    <div id="saved-reports-list" class="report-list">
+                        <!-- Filled by JS -->
+                    </div>
+                    <div id="no-reports" class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <div class="empty-state-text">Aucun rapport enregistré.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Remarque -->
+    <div class="modal-overlay" id="modal-remarque">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-remarque-title">Nouvelle remarque</h3>
+                <button class="modal-close" id="modal-remarque-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="remarque-edit-id">
+
+                <div class="form-group">
+                    <label class="form-label">Description *</label>
+                    <textarea id="remarque-description" class="form-control" placeholder="Décrivez la remarque..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Entreprise</label>
+                        <div class="combobox-wrapper">
+                            <input type="text" id="remarque-entreprise" class="form-control" placeholder="Sélectionner ou saisir..." autocomplete="off">
+                            <div id="entreprise-suggestions" class="combobox-suggestions"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Statut</label>
+                        <select id="remarque-statut" class="form-control">
+                            <option value="todo">🔴 À faire</option>
+                            <option value="progress">🟠 En cours</option>
+                            <option value="done">🟢 Terminé</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Localisation</label>
+                        <div class="combobox-wrapper">
+                            <input type="text" id="remarque-localisation" class="form-control" placeholder="Sélectionner ou saisir..." autocomplete="off">
+                            <div id="localisation-suggestions" class="combobox-suggestions"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Étage / Niveau</label>
+                        <div class="combobox-wrapper">
+                            <input type="text" id="remarque-niveau" class="form-control" placeholder="Sélectionner ou saisir..." autocomplete="off">
+                            <div id="niveau-suggestions" class="combobox-suggestions"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">À faire pour le</label>
+                        <input type="date" id="remarque-date-limite" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fait le</label>
+                        <input type="date" id="remarque-date-fait" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Photos (max 4)</label>
+                    <div class="remarque-photos" style="background: transparent; padding: 0;">
+                        <div class="photo-slot" data-photo="1">
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                            <span class="photo-slot-icon">📷</span>
+                            <span class="photo-slot-text">Photo 1</span>
+                        </div>
+                        <div class="photo-slot" data-photo="2">
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                            <span class="photo-slot-icon">📷</span>
+                            <span class="photo-slot-text">Photo 2</span>
+                        </div>
+                        <div class="photo-slot" data-photo="3">
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                            <span class="photo-slot-icon">📷</span>
+                            <span class="photo-slot-text">Photo 3</span>
+                        </div>
+                        <div class="photo-slot" data-photo="4">
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                            <span class="photo-slot-icon">📷</span>
+                            <span class="photo-slot-text">Photo 4</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-remarque">Annuler</button>
+                <button class="btn btn-primary" id="btn-save-remarque">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Chantier Config -->
+    <div class="modal-overlay" id="modal-chantier">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Configurer un chantier</h3>
+                <button class="modal-close" id="modal-chantier-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="chantier-edit-id">
+
+                <div class="form-group">
+                    <label class="form-label">Nom du chantier *</label>
+                    <input type="text" id="config-chantier-nom" class="form-control" placeholder="Ex: Construction résidence étudiante...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Adresse</label>
+                    <input type="text" id="config-chantier-adresse" class="form-control" placeholder="Adresse complète...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Maître d'ouvrage</label>
+                    <input type="text" id="config-chantier-mo" class="form-control" placeholder="Nom du maître d'ouvrage...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Maître d'œuvre exécution</label>
+                    <input type="text" id="config-chantier-moe" class="form-control" placeholder="Nom du maître d'œuvre...">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-chantier">Annuler</button>
+                <button class="btn btn-primary" id="btn-save-chantier">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Select Chantier -->
+    <div class="modal-overlay" id="modal-select-chantier">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Sélectionner un chantier</h3>
+                <button class="modal-close" id="modal-select-chantier-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="select-chantier-list" class="report-list">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // ============================================
+        // DATA STORE
+        // ============================================
+        const Store = {
+            data: {
+                chantiers: [],
+                entreprises: [],
+                niveaux: [],
+                localisations: [],
+                remarques: [],
+                savedReports: [],
+                currentChantier: {
+                    nom: '',
+                    adresse: '',
+                    mo: '',
+                    moe: '',
+                    dateVisite: ''
+                }
+            },
+
+            init() {
+                const saved = localStorage.getItem('gestionChantierData');
+                if (saved) {
+                    this.data = JSON.parse(saved);
+                }
+                // Set default date
+                if (!this.data.currentChantier.dateVisite) {
+                    this.data.currentChantier.dateVisite = new Date().toISOString().split('T')[0];
+                }
+            },
+
+            save() {
+                localStorage.setItem('gestionChantierData', JSON.stringify(this.data));
+            },
+
+            // Entreprises
+            addEntreprise(name) {
+                if (name && !this.data.entreprises.includes(name)) {
+                    this.data.entreprises.push(name);
+                    this.save();
+                    return true;
+                }
+                return false;
+            },
+
+            removeEntreprise(name) {
+                this.data.entreprises = this.data.entreprises.filter(e => e !== name);
+                this.save();
+            },
+
+            // Niveaux
+            addNiveau(name) {
+                if (name && !this.data.niveaux.includes(name)) {
+                    this.data.niveaux.push(name);
+                    this.save();
+                    return true;
+                }
+                return false;
+            },
+
+            removeNiveau(name) {
+                this.data.niveaux = this.data.niveaux.filter(n => n !== name);
+                this.save();
+            },
+
+            // Localisations
+            addLocalisation(name) {
+                if (name && !this.data.localisations.includes(name)) {
+                    this.data.localisations.push(name);
+                    this.save();
+                    return true;
+                }
+                return false;
+            },
+
+            removeLocalisation(name) {
+                this.data.localisations = this.data.localisations.filter(l => l !== name);
+                this.save();
+            },
+
+            // Chantiers
+            addChantier(chantier) {
+                chantier.id = Date.now();
+                this.data.chantiers.push(chantier);
+                this.save();
+                return chantier;
+            },
+
+            updateChantier(id, chantier) {
+                const index = this.data.chantiers.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    this.data.chantiers[index] = { ...chantier, id };
+                    this.save();
+                }
+            },
+
+            removeChantier(id) {
+                this.data.chantiers = this.data.chantiers.filter(c => c.id !== id);
+                this.save();
+            },
+
+            // Remarques
+            addRemarque(remarque) {
+                remarque.id = Date.now();
+                remarque.createdAt = new Date().toISOString();
+                this.data.remarques.push(remarque);
+                this.save();
+                return remarque;
+            },
+
+            updateRemarque(id, remarque) {
+                const index = this.data.remarques.findIndex(r => r.id === id);
+                if (index !== -1) {
+                    this.data.remarques[index] = { ...remarque, id };
+                    this.save();
+                }
+            },
+
+            removeRemarque(id) {
+                this.data.remarques = this.data.remarques.filter(r => r.id !== id);
+                this.save();
+            },
+
+            // Reports
+            saveReport(name) {
+                const report = {
+                    id: Date.now(),
+                    name: name,
+                    date: new Date().toISOString(),
+                    chantier: { ...this.data.currentChantier },
+                    remarques: [...this.data.remarques]
+                };
+                this.data.savedReports.push(report);
+                this.save();
+                return report;
+            },
+
+            loadReport(id) {
+                const report = this.data.savedReports.find(r => r.id === id);
+                if (report) {
+                    this.data.currentChantier = { ...report.chantier };
+                    this.data.remarques = [...report.remarques];
+                    this.save();
+                }
+                return report;
+            },
+
+            deleteReport(id) {
+                this.data.savedReports = this.data.savedReports.filter(r => r.id !== id);
+                this.save();
+            },
+
+            // Current Chantier
+            updateCurrentChantier(chantier) {
+                this.data.currentChantier = { ...this.data.currentChantier, ...chantier };
+                this.save();
+            },
+
+            // Stats
+            getStats() {
+                const remarques = this.data.remarques;
+                return {
+                    total: remarques.length,
+                    todo: remarques.filter(r => r.statut === 'todo').length,
+                    progress: remarques.filter(r => r.statut === 'progress').length,
+                    done: remarques.filter(r => r.statut === 'done').length
+                };
+            },
+
+            // Summary by entreprise
+            getSummaryByEntreprise() {
+                const summary = {};
+                this.data.remarques.forEach(r => {
+                    const ent = r.entreprise || 'Non assigné';
+                    if (!summary[ent]) {
+                        summary[ent] = { todo: 0, progress: 0, done: 0, total: 0 };
+                    }
+                    summary[ent][r.statut]++;
+                    summary[ent].total++;
+                });
+                return summary;
+            },
+
+            clearRemarques() {
+                this.data.remarques = [];
+                this.save();
+            }
+        };
+
+        // ============================================
+        // UI CONTROLLER
+        // ============================================
+        const UI = {
+            activeFilters: ['todo', 'progress', 'done'],
+            tempPhotos: [null, null, null, null],
+
+            init() {
+                this.bindEvents();
+                this.render();
+            },
+
+            bindEvents() {
+                // Navigation
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.addEventListener('click', () => this.switchPage(tab.dataset.page));
+                });
+
+                // Filters
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.addEventListener('click', () => this.toggleFilter(chip.dataset.filter));
+                });
+
+                // Buttons
+                document.getElementById('btn-add-remarque').addEventListener('click', () => this.openRemarqueModal());
+                document.getElementById('btn-save-remarque').addEventListener('click', () => this.saveRemarque());
+                document.getElementById('btn-cancel-remarque').addEventListener('click', () => this.closeRemarqueModal());
+                document.getElementById('modal-remarque-close').addEventListener('click', () => this.closeRemarqueModal());
+
+                document.getElementById('btn-generate-pdf').addEventListener('click', () => this.generatePDF());
+                document.getElementById('btn-save-report').addEventListener('click', () => this.saveReport());
+
+                document.getElementById('btn-select-chantier').addEventListener('click', () => this.openSelectChantierModal());
+                document.getElementById('modal-select-chantier-close').addEventListener('click', () => this.closeSelectChantierModal());
+
+                // Config buttons
+                document.getElementById('btn-add-entreprise').addEventListener('click', () => this.addEntreprise());
+                document.getElementById('btn-add-niveau').addEventListener('click', () => this.addNiveau());
+                document.getElementById('btn-add-localisation').addEventListener('click', () => this.addLocalisation());
+                document.getElementById('btn-add-chantier-config').addEventListener('click', () => this.openChantierConfigModal());
+                document.getElementById('btn-save-chantier').addEventListener('click', () => this.saveChantierConfig());
+                document.getElementById('btn-cancel-chantier').addEventListener('click', () => this.closeChantierConfigModal());
+                document.getElementById('modal-chantier-close').addEventListener('click', () => this.closeChantierConfigModal());
+
+                // Enter key for config inputs
+                document.getElementById('new-entreprise').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addEntreprise();
+                });
+                document.getElementById('new-niveau').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addNiveau();
+                });
+                document.getElementById('new-localisation').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addLocalisation();
+                });
+
+                // Chantier info auto-save
+                ['chantier-nom', 'chantier-adresse', 'chantier-mo', 'chantier-moe', 'date-visite'].forEach(id => {
+                    document.getElementById(id).addEventListener('change', () => this.updateChantierInfo());
+                });
+
+                // Photo uploads in modal
+                document.querySelectorAll('#modal-remarque .photo-slot').forEach(slot => {
+                    const input = slot.querySelector('input[type="file"]');
+                    slot.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('photo-remove')) {
+                            input.click();
+                        }
+                    });
+                    input.addEventListener('change', (e) => this.handlePhotoUpload(e, parseInt(slot.dataset.photo) - 1));
+                });
+
+                // Combobox suggestions
+                this.setupCombobox('remarque-entreprise', 'entreprise-suggestions', () => Store.data.entreprises);
+                this.setupCombobox('remarque-localisation', 'localisation-suggestions', () => Store.data.localisations);
+                this.setupCombobox('remarque-niveau', 'niveau-suggestions', () => Store.data.niveaux);
+
+                // Modal overlay click to close
+                document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                    overlay.addEventListener('click', (e) => {
+                        if (e.target === overlay) {
+                            overlay.classList.remove('active');
+                        }
+                    });
+                });
+            },
+
+            setupCombobox(inputId, suggestionsId, getOptions) {
+                const input = document.getElementById(inputId);
+                const suggestions = document.getElementById(suggestionsId);
+
+                input.addEventListener('focus', () => {
+                    this.showSuggestions(suggestions, getOptions(), input);
+                });
+
+                input.addEventListener('input', () => {
+                    const filtered = getOptions().filter(opt =>
+                        opt.toLowerCase().includes(input.value.toLowerCase())
+                    );
+                    this.showSuggestions(suggestions, filtered, input);
+                });
+
+                input.addEventListener('blur', () => {
+                    setTimeout(() => suggestions.classList.remove('active'), 200);
+                });
+            },
+
+            showSuggestions(container, options, input) {
+                if (options.length === 0) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                container.innerHTML = options.map(opt =>
+                    `<div class="combobox-option">${opt}</div>`
+                ).join('');
+
+                container.querySelectorAll('.combobox-option').forEach(opt => {
+                    opt.addEventListener('mousedown', () => {
+                        input.value = opt.textContent;
+                    });
+                });
+
+                container.classList.add('active');
+            },
+
+            switchPage(page) {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`page-${page}`).classList.add('active');
+
+                if (page === 'config') this.renderConfig();
+                if (page === 'historique') this.renderHistorique();
+            },
+
+            toggleFilter(filter) {
+                const index = this.activeFilters.indexOf(filter);
+                if (index > -1) {
+                    this.activeFilters.splice(index, 1);
+                } else {
+                    this.activeFilters.push(filter);
+                }
+
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                    chip.classList.toggle('active', this.activeFilters.includes(chip.dataset.filter));
+                });
+
+                this.renderRemarques();
+            },
+
+            render() {
+                this.renderChantierInfo();
+                this.renderStats();
+                this.renderSummaryTable();
+                this.renderRemarques();
+                this.renderConfig();
+            },
+
+            renderChantierInfo() {
+                const c = Store.data.currentChantier;
+                document.getElementById('chantier-nom').value = c.nom || '';
+                document.getElementById('chantier-adresse').value = c.adresse || '';
+                document.getElementById('chantier-mo').value = c.mo || '';
+                document.getElementById('chantier-moe').value = c.moe || '';
+                document.getElementById('date-visite').value = c.dateVisite || new Date().toISOString().split('T')[0];
+            },
+
+            updateChantierInfo() {
+                Store.updateCurrentChantier({
+                    nom: document.getElementById('chantier-nom').value,
+                    adresse: document.getElementById('chantier-adresse').value,
+                    mo: document.getElementById('chantier-mo').value,
+                    moe: document.getElementById('chantier-moe').value,
+                    dateVisite: document.getElementById('date-visite').value
+                });
+            },
+
+            renderStats() {
+                const stats = Store.getStats();
+                document.getElementById('stat-total').textContent = stats.total;
+                document.getElementById('stat-todo').textContent = stats.todo;
+                document.getElementById('stat-progress').textContent = stats.progress;
+                document.getElementById('stat-done').textContent = stats.done;
+            },
+
+            renderSummaryTable() {
+                const summary = Store.getSummaryByEntreprise();
+                const tbody = document.getElementById('summary-table-body');
+
+                if (Object.keys(summary).length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Aucune donnée</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = Object.entries(summary).map(([ent, counts]) => `
+                    <tr>
+                        <td><strong>${ent}</strong></td>
+                        <td class="count todo">${counts.todo || '-'}</td>
+                        <td class="count progress">${counts.progress || '-'}</td>
+                        <td class="count done">${counts.done || '-'}</td>
+                        <td class="count"><strong>${counts.total}</strong></td>
+                    </tr>
+                `).join('');
+            },
+
+            renderRemarques() {
+                const container = document.getElementById('remarques-container');
+                const emptyState = document.getElementById('empty-state');
+
+                const filtered = Store.data.remarques.filter(r => this.activeFilters.includes(r.statut));
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+
+                container.innerHTML = filtered.map((r, index) => {
+                    const statusClass = `status-${r.statut}`;
+                    const statusBadge = {
+                        todo: '<span class="badge badge-todo">🔴 À FAIRE</span>',
+                        progress: '<span class="badge badge-progress">🟠 EN COURS</span>',
+                        done: '<span class="badge badge-done">🟢 TERMINÉ</span>'
+                    }[r.statut];
+
+                    const photos = (r.photos || []).filter(p => p);
+                    const photosHtml = photos.length > 0
+                        ? `<div class="remarque-photos">${photos.map(p => `<div class="photo-slot has-photo"><img src="${p}" alt="Photo"></div>`).join('')}</div>`
+                        : '';
+
+                    return `
+                        <div class="remarque-card ${statusClass}" data-id="${r.id}">
+                            <div class="remarque-header">
+                                <div class="remarque-number">
+                                    <span class="remarque-id">#${index + 1}</span>
+                                    ${statusBadge}
+                                </div>
+                                ${r.entreprise ? `<span class="remarque-entreprise">${r.entreprise}</span>` : ''}
+                            </div>
+                            <div class="remarque-body">
+                                <div class="remarque-description">${r.description || 'Sans description'}</div>
+                                <div class="remarque-meta">
+                                    ${r.localisation ? `<span class="remarque-meta-item">📍 ${r.localisation}</span>` : ''}
+                                    ${r.niveau ? `<span class="remarque-meta-item">🏠 ${r.niveau}</span>` : ''}
+                                    ${r.dateLimite ? `<span class="remarque-meta-item">📅 À faire: ${this.formatDate(r.dateLimite)}</span>` : ''}
+                                    ${r.dateFait ? `<span class="remarque-meta-item">✅ Fait: ${this.formatDate(r.dateFait)}</span>` : ''}
+                                </div>
+                            </div>
+                            ${photosHtml}
+                            <div class="remarque-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="UI.editRemarque(${r.id})">✏️ Modifier</button>
+                                <button class="btn btn-danger btn-sm" onclick="UI.deleteRemarque(${r.id})">🗑️ Supprimer</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            renderConfig() {
+                // Entreprises
+                const entreprisesTags = document.getElementById('entreprises-tags');
+                entreprisesTags.innerHTML = Store.data.entreprises.map(e => `
+                    <span class="tag">
+                        ${e}
+                        <button class="tag-remove" onclick="UI.removeEntreprise('${e}')">×</button>
+                    </span>
+                `).join('');
+
+                // Niveaux
+                const niveauxTags = document.getElementById('niveaux-tags');
+                niveauxTags.innerHTML = Store.data.niveaux.map(n => `
+                    <span class="tag">
+                        ${n}
+                        <button class="tag-remove" onclick="UI.removeNiveau('${n}')">×</button>
+                    </span>
+                `).join('');
+
+                // Localisations
+                const localisationsTags = document.getElementById('localisations-tags');
+                localisationsTags.innerHTML = Store.data.localisations.map(l => `
+                    <span class="tag">
+                        ${l}
+                        <button class="tag-remove" onclick="UI.removeLocalisation('${l}')">×</button>
+                    </span>
+                `).join('');
+
+                // Chantiers
+                const chantiersList = document.getElementById('chantiers-list');
+                if (Store.data.chantiers.length === 0) {
+                    chantiersList.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Aucun chantier configuré</p>';
+                } else {
+                    chantiersList.innerHTML = Store.data.chantiers.map(c => `
+                        <div class="report-item">
+                            <div class="report-info">
+                                <div class="report-name">${c.nom}</div>
+                                <div class="report-date">${c.adresse || 'Pas d\'adresse'}</div>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="UI.editChantierConfig(${c.id})">✏️</button>
+                                <button class="btn btn-danger btn-sm" onclick="UI.deleteChantierConfig(${c.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            },
+
+            renderHistorique() {
+                const list = document.getElementById('saved-reports-list');
+                const noReports = document.getElementById('no-reports');
+
+                if (Store.data.savedReports.length === 0) {
+                    list.innerHTML = '';
+                    noReports.classList.remove('hidden');
+                    return;
+                }
+
+                noReports.classList.add('hidden');
+                list.innerHTML = Store.data.savedReports.map(r => `
+                    <div class="report-item">
+                        <div class="report-info">
+                            <div class="report-name">${r.name}</div>
+                            <div class="report-date">${this.formatDateTime(r.date)} - ${r.remarques.length} remarque(s)</div>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn btn-primary btn-sm" onclick="UI.loadReport(${r.id})">📂 Charger</button>
+                            <button class="btn btn-danger btn-sm" onclick="UI.deleteReport(${r.id})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // Remarque Modal
+            openRemarqueModal(remarque = null) {
+                document.getElementById('modal-remarque-title').textContent = remarque ? 'Modifier la remarque' : 'Nouvelle remarque';
+                document.getElementById('remarque-edit-id').value = remarque ? remarque.id : '';
+                document.getElementById('remarque-description').value = remarque?.description || '';
+                document.getElementById('remarque-entreprise').value = remarque?.entreprise || '';
+                document.getElementById('remarque-statut').value = remarque?.statut || 'todo';
+                document.getElementById('remarque-localisation').value = remarque?.localisation || '';
+                document.getElementById('remarque-niveau').value = remarque?.niveau || '';
+                document.getElementById('remarque-date-limite').value = remarque?.dateLimite || '';
+                document.getElementById('remarque-date-fait').value = remarque?.dateFait || '';
+
+                // Reset photos
+                this.tempPhotos = remarque?.photos ? [...remarque.photos] : [null, null, null, null];
+                while (this.tempPhotos.length < 4) this.tempPhotos.push(null);
+
+                document.querySelectorAll('#modal-remarque .photo-slot').forEach((slot, i) => {
+                    if (this.tempPhotos[i]) {
+                        slot.classList.add('has-photo');
+                        slot.innerHTML = `
+                            <img src="${this.tempPhotos[i]}" alt="Photo">
+                            <button class="photo-remove" onclick="UI.removePhoto(${i}); event.stopPropagation();">×</button>
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                        `;
+                    } else {
+                        slot.classList.remove('has-photo');
+                        slot.innerHTML = `
+                            <input type="file" accept="image/*" capture="environment" style="display: none;">
+                            <span class="photo-slot-icon">📷</span>
+                            <span class="photo-slot-text">Photo ${i + 1}</span>
+                        `;
+                    }
+                    // Rebind file input
+                    const input = slot.querySelector('input[type="file"]');
+                    input.addEventListener('change', (e) => this.handlePhotoUpload(e, i));
+                });
+
+                document.getElementById('modal-remarque').classList.add('active');
+            },
+
+            closeRemarqueModal() {
+                document.getElementById('modal-remarque').classList.remove('active');
+            },
+
+            saveRemarque() {
+                const id = document.getElementById('remarque-edit-id').value;
+                const remarque = {
+                    description: document.getElementById('remarque-description').value,
+                    entreprise: document.getElementById('remarque-entreprise').value,
+                    statut: document.getElementById('remarque-statut').value,
+                    localisation: document.getElementById('remarque-localisation').value,
+                    niveau: document.getElementById('remarque-niveau').value,
+                    dateLimite: document.getElementById('remarque-date-limite').value,
+                    dateFait: document.getElementById('remarque-date-fait').value,
+                    photos: this.tempPhotos.filter(p => p)
+                };
+
+                if (id) {
+                    Store.updateRemarque(parseInt(id), remarque);
+                } else {
+                    Store.addRemarque(remarque);
+                }
+
+                this.closeRemarqueModal();
+                this.render();
+            },
+
+            editRemarque(id) {
+                const remarque = Store.data.remarques.find(r => r.id === id);
+                if (remarque) {
+                    this.openRemarqueModal(remarque);
+                }
+            },
+
+            deleteRemarque(id) {
+                if (confirm('Supprimer cette remarque ?')) {
+                    Store.removeRemarque(id);
+                    this.render();
+                }
+            },
+
+            async handlePhotoUpload(event, index) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const compressed = await this.compressImage(file, 1200, 0.8);
+                this.tempPhotos[index] = compressed;
+
+                const slot = document.querySelectorAll('#modal-remarque .photo-slot')[index];
+                slot.classList.add('has-photo');
+                slot.innerHTML = `
+                    <img src="${compressed}" alt="Photo">
+                    <button class="photo-remove" onclick="UI.removePhoto(${index}); event.stopPropagation();">×</button>
+                    <input type="file" accept="image/*" capture="environment" style="display: none;">
+                `;
+                const input = slot.querySelector('input[type="file"]');
+                input.addEventListener('change', (e) => this.handlePhotoUpload(e, index));
+            },
+
+            removePhoto(index) {
+                this.tempPhotos[index] = null;
+                const slot = document.querySelectorAll('#modal-remarque .photo-slot')[index];
+                slot.classList.remove('has-photo');
+                slot.innerHTML = `
+                    <input type="file" accept="image/*" capture="environment" style="display: none;">
+                    <span class="photo-slot-icon">📷</span>
+                    <span class="photo-slot-text">Photo ${index + 1}</span>
+                `;
+                const input = slot.querySelector('input[type="file"]');
+                input.addEventListener('change', (e) => this.handlePhotoUpload(e, index));
+            },
+
+            compressImage(file, maxWidth, quality) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+
+                            if (width > maxWidth) {
+                                height = (maxWidth / width) * height;
+                                width = maxWidth;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                            resolve(canvas.toDataURL('image/jpeg', quality));
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            },
+
+            // Config methods
+            addEntreprise() {
+                const input = document.getElementById('new-entreprise');
+                if (Store.addEntreprise(input.value.trim())) {
+                    input.value = '';
+                    this.renderConfig();
+                }
+            },
+
+            removeEntreprise(name) {
+                Store.removeEntreprise(name);
+                this.renderConfig();
+            },
+
+            addNiveau() {
+                const input = document.getElementById('new-niveau');
+                if (Store.addNiveau(input.value.trim())) {
+                    input.value = '';
+                    this.renderConfig();
+                }
+            },
+
+            removeNiveau(name) {
+                Store.removeNiveau(name);
+                this.renderConfig();
+            },
+
+            addLocalisation() {
+                const input = document.getElementById('new-localisation');
+                if (Store.addLocalisation(input.value.trim())) {
+                    input.value = '';
+                    this.renderConfig();
+                }
+            },
+
+            removeLocalisation(name) {
+                Store.removeLocalisation(name);
+                this.renderConfig();
+            },
+
+            openChantierConfigModal(chantier = null) {
+                document.getElementById('chantier-edit-id').value = chantier ? chantier.id : '';
+                document.getElementById('config-chantier-nom').value = chantier?.nom || '';
+                document.getElementById('config-chantier-adresse').value = chantier?.adresse || '';
+                document.getElementById('config-chantier-mo').value = chantier?.mo || '';
+                document.getElementById('config-chantier-moe').value = chantier?.moe || '';
+                document.getElementById('modal-chantier').classList.add('active');
+            },
+
+            closeChantierConfigModal() {
+                document.getElementById('modal-chantier').classList.remove('active');
+            },
+
+            saveChantierConfig() {
+                const id = document.getElementById('chantier-edit-id').value;
+                const chantier = {
+                    nom: document.getElementById('config-chantier-nom').value,
+                    adresse: document.getElementById('config-chantier-adresse').value,
+                    mo: document.getElementById('config-chantier-mo').value,
+                    moe: document.getElementById('config-chantier-moe').value
+                };
+
+                if (id) {
+                    Store.updateChantier(parseInt(id), chantier);
+                } else {
+                    Store.addChantier(chantier);
+                }
+
+                this.closeChantierConfigModal();
+                this.renderConfig();
+            },
+
+            editChantierConfig(id) {
+                const chantier = Store.data.chantiers.find(c => c.id === id);
+                if (chantier) {
+                    this.openChantierConfigModal(chantier);
+                }
+            },
+
+            deleteChantierConfig(id) {
+                if (confirm('Supprimer ce chantier ?')) {
+                    Store.removeChantier(id);
+                    this.renderConfig();
+                }
+            },
+
+            openSelectChantierModal() {
+                const list = document.getElementById('select-chantier-list');
+                if (Store.data.chantiers.length === 0) {
+                    list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Aucun chantier configuré. Allez dans Configuration pour en ajouter.</p>';
+                } else {
+                    list.innerHTML = Store.data.chantiers.map(c => `
+                        <div class="report-item" style="cursor: pointer;" onclick="UI.selectChantier(${c.id})">
+                            <div class="report-info">
+                                <div class="report-name">${c.nom}</div>
+                                <div class="report-date">${c.adresse || 'Pas d\'adresse'}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('modal-select-chantier').classList.add('active');
+            },
+
+            closeSelectChantierModal() {
+                document.getElementById('modal-select-chantier').classList.remove('active');
+            },
+
+            selectChantier(id) {
+                const chantier = Store.data.chantiers.find(c => c.id === id);
+                if (chantier) {
+                    Store.updateCurrentChantier({
+                        nom: chantier.nom,
+                        adresse: chantier.adresse,
+                        mo: chantier.mo,
+                        moe: chantier.moe
+                    });
+                    this.renderChantierInfo();
+                }
+                this.closeSelectChantierModal();
+            },
+
+            // Reports
+            saveReport() {
+                const name = prompt('Nom du rapport:', Store.data.currentChantier.nom || 'Rapport du ' + this.formatDate(new Date()));
+                if (name) {
+                    Store.saveReport(name);
+                    alert('Rapport enregistré !');
+                    this.renderHistorique();
+                }
+            },
+
+            loadReport(id) {
+                if (confirm('Charger ce rapport ? Le rapport actuel sera remplacé.')) {
+                    Store.loadReport(id);
+                    this.render();
+                    this.switchPage('rapport');
+                }
+            },
+
+            deleteReport(id) {
+                if (confirm('Supprimer ce rapport ?')) {
+                    Store.deleteReport(id);
+                    this.renderHistorique();
+                }
+            },
+
+            // Helpers
+            formatDate(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR');
+            },
+
+            formatDateTime(dateStr) {
+                if (!dateStr) return '';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            },
+
+            // PDF Generation
+            generatePDF() {
+                const btn = document.getElementById('btn-generate-pdf');
+                btn.innerHTML = '<span class="loading"></span> Génération...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const pageWidth = 210;
+                        const pageHeight = 297;
+                        const margin = 15;
+                        const contentWidth = pageWidth - (margin * 2);
+
+                        const primaryColor = [217, 119, 6];
+                        const secondaryColor = [31, 41, 55];
+                        const successColor = [16, 185, 129];
+                        const dangerColor = [239, 68, 68];
+                        const warningColor = [245, 158, 11];
+                        const textColor = [15, 23, 42];
+                        const mutedColor = [100, 116, 139];
+
+                        const chantier = Store.data.currentChantier;
+                        const remarques = Store.data.remarques;
+                        const summary = Store.getSummaryByEntreprise();
+
+                        // ===============================
+                        // PAGE 1: Cover page
+                        // ===============================
+
+                        // Header bar
+                        pdf.setFillColor(...primaryColor);
+                        pdf.rect(0, 0, pageWidth, 50, 'F');
+
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.setFontSize(8);
+                        pdf.text('Gestion de Chantier', margin, 12);
+                        pdf.text(this.formatDateTime(new Date().toISOString()), pageWidth - margin, 12, { align: 'right' });
+
+                        pdf.setFontSize(28);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text('RAPPORT DE VISITE DE CHANTIER', pageWidth / 2, 32, { align: 'center' });
+
+                        pdf.setFontSize(12);
+                        pdf.setFont(undefined, 'normal');
+                        pdf.text('Relevé des remarques et réserves', pageWidth / 2, 42, { align: 'center' });
+
+                        // Date box
+                        pdf.setFillColor(255, 255, 255);
+                        pdf.roundedRect(pageWidth - margin - 50, 55, 50, 20, 3, 3, 'F');
+                        pdf.setTextColor(...primaryColor);
+                        pdf.setFontSize(10);
+                        pdf.text('Date du rapport', pageWidth - margin - 25, 63, { align: 'center' });
+                        pdf.setTextColor(...textColor);
+                        pdf.setFontSize(14);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text(this.formatDate(chantier.dateVisite), pageWidth - margin - 25, 72, { align: 'center' });
+
+                        // Chantier info card
+                        let y = 85;
+                        pdf.setFillColor(248, 250, 252);
+                        pdf.roundedRect(margin, y, contentWidth, 70, 3, 3, 'F');
+                        pdf.setDrawColor(226, 232, 240);
+                        pdf.roundedRect(margin, y, contentWidth, 70, 3, 3, 'S');
+
+                        y += 10;
+                        pdf.setTextColor(...textColor);
+                        pdf.setFontSize(14);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text('Informations du chantier', margin + 10, y);
+
+                        y += 12;
+                        pdf.setFontSize(10);
+                        const infoItems = [
+                            { icon: '🏗️', label: 'Nom du chantier:', value: chantier.nom || 'Non renseigné' },
+                            { icon: '📍', label: 'Adresse:', value: chantier.adresse || 'Non renseigné' },
+                            { icon: '👤', label: 'Maître ouvrage:', value: chantier.mo || 'Non renseigné' },
+                            { icon: '👷', label: 'Maître oeuvre exécution:', value: chantier.moe || 'Non renseigné' },
+                            { icon: '📅', label: 'Date de la visite:', value: this.formatDate(chantier.dateVisite) || 'Non renseigné' }
+                        ];
+
+                        infoItems.forEach(item => {
+                            pdf.setFont(undefined, 'bold');
+                            pdf.setTextColor(...mutedColor);
+                            pdf.text(item.label, margin + 15, y);
+                            pdf.setFont(undefined, 'normal');
+                            pdf.setTextColor(...textColor);
+                            pdf.text(item.value, margin + 65, y);
+                            y += 8;
+                        });
+
+                        // Summary card
+                        y = 165;
+                        pdf.setFillColor(248, 250, 252);
+                        pdf.roundedRect(margin, y, contentWidth, 15 + Object.keys(summary).length * 10, 3, 3, 'F');
+                        pdf.setDrawColor(226, 232, 240);
+                        pdf.roundedRect(margin, y, contentWidth, 15 + Object.keys(summary).length * 10, 3, 3, 'S');
+
+                        y += 10;
+                        pdf.setTextColor(...textColor);
+                        pdf.setFontSize(14);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text('Synthèse par entreprise', margin + 10, y);
+
+                        y += 10;
+                        pdf.setFontSize(9);
+
+                        // Table header
+                        pdf.setFont(undefined, 'bold');
+                        pdf.setTextColor(...mutedColor);
+                        pdf.text('Entreprise', margin + 15, y);
+                        pdf.text('À faire', margin + 90, y, { align: 'center' });
+                        pdf.text('En cours', margin + 115, y, { align: 'center' });
+                        pdf.text('Terminé', margin + 140, y, { align: 'center' });
+                        pdf.text('Total', margin + 165, y, { align: 'center' });
+
+                        y += 6;
+
+                        Object.entries(summary).forEach(([ent, counts]) => {
+                            pdf.setFont(undefined, 'normal');
+                            pdf.setTextColor(...textColor);
+                            pdf.text(ent.substring(0, 25), margin + 15, y);
+
+                            pdf.setTextColor(...dangerColor);
+                            pdf.text(String(counts.todo || '-'), margin + 90, y, { align: 'center' });
+                            pdf.setTextColor(...warningColor);
+                            pdf.text(String(counts.progress || '-'), margin + 115, y, { align: 'center' });
+                            pdf.setTextColor(...successColor);
+                            pdf.text(String(counts.done || '-'), margin + 140, y, { align: 'center' });
+                            pdf.setTextColor(...textColor);
+                            pdf.setFont(undefined, 'bold');
+                            pdf.text(String(counts.total), margin + 165, y, { align: 'center' });
+
+                            y += 8;
+                        });
+
+                        // ===============================
+                        // REMARQUES PAGES (1 per page)
+                        // ===============================
+                        remarques.forEach((remarque, index) => {
+                            pdf.addPage();
+
+                            // Mini header
+                            pdf.setFillColor(...secondaryColor);
+                            pdf.rect(0, 0, pageWidth, 15, 'F');
+                            pdf.setTextColor(255, 255, 255);
+                            pdf.setFontSize(8);
+                            pdf.text('Gestion de Chantier', margin, 10);
+                            pdf.text(this.formatDateTime(new Date().toISOString()), pageWidth - margin, 10, { align: 'right' });
+
+                            // Remarque card
+                            y = 25;
+
+                            // Status border color
+                            const statusColors = {
+                                todo: dangerColor,
+                                progress: warningColor,
+                                done: successColor
+                            };
+                            const statusColor = statusColors[remarque.statut] || mutedColor;
+                            const statusLabels = {
+                                todo: 'À FAIRE',
+                                progress: 'EN COURS',
+                                done: 'TERMINÉ'
+                            };
+
+                            // Card with colored left border
+                            pdf.setFillColor(255, 255, 255);
+                            pdf.roundedRect(margin, y, contentWidth, pageHeight - y - 25, 3, 3, 'F');
+                            pdf.setDrawColor(226, 232, 240);
+                            pdf.roundedRect(margin, y, contentWidth, pageHeight - y - 25, 3, 3, 'S');
+
+                            // Left border accent
+                            pdf.setFillColor(...statusColor);
+                            pdf.rect(margin, y, 4, pageHeight - y - 25, 'F');
+
+                            // Header
+                            y += 12;
+                            pdf.setFillColor(...secondaryColor);
+                            pdf.roundedRect(margin + 12, y - 6, 25, 12, 2, 2, 'F');
+                            pdf.setTextColor(255, 255, 255);
+                            pdf.setFontSize(12);
+                            pdf.setFont(undefined, 'bold');
+                            pdf.text(`#${index + 1}`, margin + 24.5, y + 2, { align: 'center' });
+
+                            // Status badge
+                            pdf.setFillColor(...statusColor);
+                            pdf.roundedRect(margin + 42, y - 6, 28, 12, 2, 2, 'F');
+                            pdf.setTextColor(255, 255, 255);
+                            pdf.setFontSize(8);
+                            pdf.text(statusLabels[remarque.statut], margin + 56, y + 1, { align: 'center' });
+
+                            // Entreprise badge
+                            if (remarque.entreprise) {
+                                pdf.setFillColor(219, 234, 254);
+                                const entWidth = Math.min(remarque.entreprise.length * 2.5 + 10, 60);
+                                pdf.roundedRect(pageWidth - margin - entWidth - 8, y - 6, entWidth, 12, 2, 2, 'F');
+                                pdf.setTextColor(59, 130, 246);
+                                pdf.setFontSize(9);
+                                pdf.setFont(undefined, 'bold');
+                                pdf.text(remarque.entreprise.substring(0, 20), pageWidth - margin - entWidth/2 - 8, y + 1, { align: 'center' });
+                            }
+
+                            // Description
+                            y += 18;
+                            pdf.setTextColor(...textColor);
+                            pdf.setFontSize(14);
+                            pdf.setFont(undefined, 'bold');
+                            const descLines = pdf.splitTextToSize(remarque.description || 'Sans description', contentWidth - 30);
+                            pdf.text(descLines, margin + 15, y);
+                            y += descLines.length * 6 + 8;
+
+                            // Meta info box
+                            pdf.setFillColor(248, 250, 252);
+                            pdf.roundedRect(margin + 12, y, contentWidth - 24, 35, 2, 2, 'F');
+
+                            y += 10;
+                            pdf.setFontSize(10);
+
+                            // Row 1: Localisation & Etage
+                            if (remarque.localisation || remarque.niveau) {
+                                pdf.setFont(undefined, 'normal');
+                                pdf.setTextColor(...mutedColor);
+                                pdf.text('📍 Localisation:', margin + 18, y);
+                                pdf.setTextColor(...textColor);
+                                pdf.text(remarque.localisation || '-', margin + 50, y);
+
+                                pdf.setTextColor(...mutedColor);
+                                pdf.text('🏠 Étage:', margin + 105, y);
+                                pdf.setTextColor(...textColor);
+                                pdf.text(remarque.niveau || '-', margin + 125, y);
+                            }
+
+                            y += 10;
+
+                            // Row 2: Dates
+                            pdf.setTextColor(...mutedColor);
+                            pdf.text('📅 À faire:', margin + 18, y);
+                            pdf.setTextColor(...textColor);
+                            pdf.text(this.formatDate(remarque.dateLimite) || '-', margin + 45, y);
+
+                            if (remarque.dateFait) {
+                                pdf.setTextColor(...mutedColor);
+                                pdf.text('✅ Fait le:', margin + 105, y);
+                                pdf.setTextColor(...textColor);
+                                pdf.text(this.formatDate(remarque.dateFait), margin + 130, y);
+                            }
+
+                            // Photos
+                            y += 25;
+                            const photos = (remarque.photos || []).filter(p => p);
+
+                            if (photos.length > 0) {
+                                pdf.setTextColor(...textColor);
+                                pdf.setFontSize(11);
+                                pdf.setFont(undefined, 'bold');
+                                pdf.text(`PHOTOS (${photos.length})`, margin + 15, y);
+                                y += 8;
+
+                                const photoAreaHeight = pageHeight - y - 30;
+                                const photoSpacing = 5;
+
+                                if (photos.length === 1) {
+                                    // One photo: full width
+                                    const photoWidth = contentWidth - 30;
+                                    const photoHeight = Math.min(photoAreaHeight, photoWidth * 0.75);
+                                    try {
+                                        pdf.addImage(photos[0], 'JPEG', margin + 15, y, photoWidth, photoHeight);
+                                    } catch (e) {
+                                        console.error('Error adding photo:', e);
+                                    }
+                                } else if (photos.length === 2) {
+                                    // Two photos: side by side
+                                    const photoWidth = (contentWidth - 30 - photoSpacing) / 2;
+                                    const photoHeight = Math.min(photoAreaHeight, photoWidth * 0.75);
+                                    photos.forEach((photo, i) => {
+                                        try {
+                                            pdf.addImage(photo, 'JPEG', margin + 15 + i * (photoWidth + photoSpacing), y, photoWidth, photoHeight);
+                                        } catch (e) {
+                                            console.error('Error adding photo:', e);
+                                        }
+                                    });
+                                } else {
+                                    // 3-4 photos: 2x2 grid
+                                    const photoWidth = (contentWidth - 30 - photoSpacing) / 2;
+                                    const photoHeight = Math.min((photoAreaHeight - photoSpacing) / 2, photoWidth * 0.75);
+                                    photos.forEach((photo, i) => {
+                                        const col = i % 2;
+                                        const row = Math.floor(i / 2);
+                                        try {
+                                            pdf.addImage(photo, 'JPEG',
+                                                margin + 15 + col * (photoWidth + photoSpacing),
+                                                y + row * (photoHeight + photoSpacing),
+                                                photoWidth, photoHeight);
+                                        } catch (e) {
+                                            console.error('Error adding photo:', e);
+                                        }
+                                    });
+                                }
+                            }
+
+                            // Page number footer
+                            pdf.setTextColor(...mutedColor);
+                            pdf.setFontSize(9);
+                            pdf.text(`Page ${pdf.internal.getNumberOfPages()} sur ${remarques.length + 1}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                        });
+
+                        // Add page number to first page
+                        pdf.setPage(1);
+                        pdf.setTextColor(...mutedColor);
+                        pdf.setFontSize(9);
+                        pdf.text(`Page 1 sur ${remarques.length + 1}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+                        // Save
+                        const fileName = `Rapport_${(chantier.nom || 'Chantier').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                        pdf.save(fileName);
+
+                        btn.innerHTML = '📄 Générer le PDF';
+                        btn.disabled = false;
+
+                    } catch (error) {
+                        console.error('PDF Error:', error);
+                        alert('Erreur lors de la génération du PDF: ' + error.message);
+                        btn.innerHTML = '📄 Générer le PDF';
+                        btn.disabled = false;
+                    }
+                }, 100);
+            }
+        };
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            Store.init();
+            UI.init();
+        });
+
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+    </script>
+</body>
+</html>
