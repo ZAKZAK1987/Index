@@ -513,42 +513,55 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Dates si présentes
-                    if(r.dateLimite||r.dateFait){
+                    // Date "À faire" dans badge bleu
+                    if(r.dateLimite){
+                        const dateText='À faire: '+this.formatDate(r.dateLimite);
                         pdf.setFontSize(7);
-                        pdf.setTextColor(120,120,120);
-                        let dateText='';
-                        if(r.dateLimite)dateText+='À faire: '+this.formatDate(r.dateLimite);
-                        if(r.dateFait)dateText+=(dateText?' | ':'')+'Fait: '+this.formatDate(r.dateFait);
-                        pdf.text(dateText,colX.desc,rowY+45);
+                        const dateW=pdf.getTextWidth(dateText)+8;
+                        pdf.setFillColor(235,243,255);
+                        pdf.roundedRect(colX.desc,rowY+42,dateW,8,2,2,'F');
+                        pdf.setFont('helvetica','bold');
+                        pdf.setTextColor(59,91,170);
+                        pdf.text(dateText,colX.desc+dateW/2,rowY+47,{align:'center'});
+                    }
+                    if(r.dateFait){
+                        const faitText='Fait: '+this.formatDate(r.dateFait);
+                        pdf.setFontSize(7);
+                        const faitW=pdf.getTextWidth(faitText)+8;
+                        const faitX=r.dateLimite?colX.desc+pdf.getTextWidth('À faire: '+this.formatDate(r.dateLimite))+14:colX.desc;
+                        pdf.setFillColor(235,255,243);
+                        pdf.roundedRect(faitX,rowY+42,faitW,8,2,2,'F');
+                        pdf.setFont('helvetica','bold');
+                        pdf.setTextColor(39,174,96);
+                        pdf.text(faitText,faitX+faitW/2,rowY+47,{align:'center'});
                     }
 
-                    // Photos côte à côte (même taille, ratio 4:3 paysage)
+                    // Photos en grille (plus grandes)
                     const photos=(r.photos||[]).filter(p=>p);
                     if(photos.length>0){
-                        const photoW=24; // Largeur fixe pour chaque photo
-                        const photoH=18; // Hauteur fixe (ratio 4:3 paysage)
+                        const photoW=25; // Largeur photo
+                        const photoH=19; // Hauteur photo (ratio 4:3)
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
                                 const col=j%2;
                                 const row=Math.floor(j/2);
-                                const px=colX.photo+col*(photoW+2);
-                                const py=rowY+row*(photoH+2);
+                                const px=colX.photo+col*(photoW+1);
+                                const py=rowY+row*(photoH+1);
                                 pdf.addImage(p,'JPEG',px,py,photoW,photoH);
                             }catch(e){}
                         });
                     }
 
-                    // Lot (Entreprise) - Badge bleu
+                    // Lot (Entreprise) - Badge bleu centré
                     if(r.entreprise){
-                        const lotText=r.entreprise.substring(0,15);
-                        const lotW=Math.min(pdf.getTextWidth(lotText)+8,colW.lot);
-                        pdf.setFillColor(235,243,255); // Fond bleu clair
-                        pdf.roundedRect(colX.lot,rowY,lotW,10,3,3,'F');
+                        const lotText=r.entreprise.substring(0,12);
                         pdf.setFontSize(8);
                         pdf.setFont('helvetica','bold');
-                        pdf.setTextColor(59,91,170); // Texte bleu foncé
-                        pdf.text(lotText,colX.lot+4,rowY+7);
+                        const lotW=Math.max(pdf.getTextWidth(lotText)+10,25);
+                        pdf.setFillColor(235,243,255);
+                        pdf.roundedRect(colX.lot,rowY,lotW,12,4,4,'F');
+                        pdf.setTextColor(59,91,170);
+                        pdf.text(lotText,colX.lot+lotW/2,rowY+8,{align:'center'});
                     }
 
                     rowOnPage++;
