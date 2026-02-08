@@ -169,8 +169,47 @@
     <script>
 const Store={
     data:{chantiers:[],remarques:[],savedReports:[],currentChantier:{id:null,nom:'',adresse:'',mo:'',moe:'',dateVisite:'',dateMiseAJour:'',entreprises:[],niveaux:[],localisations:[]},currentReportId:null},
-    init(){const s=localStorage.getItem('gestionChantierDataV2');if(s){this.data=JSON.parse(s)}else{const old=localStorage.getItem('gestionChantierData');if(old){const o=JSON.parse(old);this.data.chantiers=o.chantiers||[];this.data.remarques=o.remarques||[];this.data.savedReports=o.savedReports||[];if(o.entreprises&&o.entreprises.length){this.data.chantiers.forEach(c=>{c.entreprises=c.entreprises||[...o.entreprises];c.niveaux=c.niveaux||[...o.niveaux];c.localisations=c.localisations||[...o.localisations]})}this.save()}}if(!this.data.currentChantier.dateVisite)this.data.currentChantier.dateVisite=new Date().toISOString().split('T')[0]},
-    save(){localStorage.setItem('gestionChantierDataV2',JSON.stringify(this.data))},
+    authHeader:'',
+    apiUrl:'api.php',
+    syncPending:false,
+    setAuth(user,pass){this.authHeader='Basic '+btoa(user+':'+pass)},
+    async init(){
+        // Charger d'abord depuis localStorage comme cache
+        const s=localStorage.getItem('gestionChantierDataV2');
+        if(s){this.data=JSON.parse(s)}
+        // Puis synchroniser avec le serveur
+        await this.syncFromServer();
+        if(!this.data.currentChantier.dateVisite)this.data.currentChantier.dateVisite=new Date().toISOString().split('T')[0];
+    },
+    async syncFromServer(){
+        try{
+            const res=await fetch(this.apiUrl,{headers:{'Authorization':this.authHeader}});
+            if(res.ok){
+                const serverData=await res.json();
+                // Fusionner: le serveur a priorité
+                if(serverData&&(serverData.chantiers||serverData.remarques||serverData.savedReports)){
+                    this.data=serverData;
+                    localStorage.setItem('gestionChantierDataV2',JSON.stringify(this.data));
+                }
+            }
+        }catch(e){console.log('Sync offline, utilisation cache local');}
+    },
+    save(){
+        localStorage.setItem('gestionChantierDataV2',JSON.stringify(this.data));
+        this.syncToServer();
+    },
+    async syncToServer(){
+        if(this.syncPending)return;
+        this.syncPending=true;
+        try{
+            await fetch(this.apiUrl,{
+                method:'POST',
+                headers:{'Authorization':this.authHeader,'Content-Type':'application/json'},
+                body:JSON.stringify(this.data)
+            });
+        }catch(e){console.log('Sauvegarde serveur échouée, données en cache local');}
+        this.syncPending=false;
+    },
     addChantier(c){c.id=Date.now();c.entreprises=c.entreprises||[];c.niveaux=c.niveaux||[];c.localisations=c.localisations||[];this.data.chantiers.push(c);this.save();return c},
     updateChantier(id,c){const i=this.data.chantiers.findIndex(x=>x.id===id);if(i!==-1){this.data.chantiers[i]={...this.data.chantiers[i],...c,id};this.save()}},
     removeChantier(id){this.data.chantiers=this.data.chantiers.filter(c=>c.id!==id);this.save()},
@@ -255,19 +294,48 @@ const UI={
 const Auth={
     credentials:{user:'admin',pass:'chantier2026'},
     isLoggedIn(){return sessionStorage.getItem('pillar_auth')==='true'},
-    login(user,pass){if(user===this.credentials.user&&pass===this.credentials.pass){sessionStorage.setItem('pillar_auth','true');return true}return false},
-    logout(){sessionStorage.removeItem('pillar_auth');location.reload()},
+    getCredentials(){return{user:sessionStorage.getItem('pillar_user')||'admin',pass:sessionStorage.getItem('pillar_pass')||'chantier2026'}},
+    login(user,pass){if(user===this.credentials.user&&pass===this.credentials.pass){sessionStorage.setItem('pillar_auth','true');sessionStorage.setItem('pillar_user',user);sessionStorage.setItem('pillar_pass',pass);return true}return false},
+    logout(){sessionStorage.removeItem('pillar_auth');sessionStorage.removeItem('pillar_user');sessionStorage.removeItem('pillar_pass');location.reload()},
     init(){
         const loginScreen=document.getElementById('login-screen');
         const loginForm=document.getElementById('login-form');
         const loginError=document.getElementById('login-error');
         const btnLogout=document.getElementById('btn-logout');
-        if(this.isLoggedIn()){loginScreen.style.display='none'}else{loginScreen.style.display='flex';document.querySelector('.nav').style.display='none';document.querySelector('.main').style.display='none'}
-        loginForm.addEventListener('submit',e=>{e.preventDefault();const user=document.getElementById('login-user').value;const pass=document.getElementById('login-pass').value;if(this.login(user,pass)){loginScreen.style.display='none';document.querySelector('.nav').style.display='block';document.querySelector('.main').style.display='block';Store.init();UI.init()}else{loginError.style.display='block'}});
+        if(this.isLoggedIn()){
+            loginScreen.style.display='none';
+            const creds=this.getCredentials();
+            Store.setAuth(creds.user,creds.pass);
+        }else{
+            loginScreen.style.display='flex';
+            document.querySelector('.nav').style.display='none';
+            document.querySelector('.main').style.display='none';
+        }
+        loginForm.addEventListener('submit',async e=>{
+            e.preventDefault();
+            const user=document.getElementById('login-user').value;
+            const pass=document.getElementById('login-pass').value;
+            if(this.login(user,pass)){
+                loginScreen.style.display='none';
+                document.querySelector('.nav').style.display='block';
+                document.querySelector('.main').style.display='block';
+                Store.setAuth(user,pass);
+                await Store.init();
+                UI.init();
+            }else{
+                loginError.style.display='block';
+            }
+        });
         btnLogout.addEventListener('click',()=>this.logout());
     }
 };
-document.addEventListener('DOMContentLoaded',()=>{Auth.init();if(Auth.isLoggedIn()){Store.init();UI.init()}});
+document.addEventListener('DOMContentLoaded',async()=>{
+    Auth.init();
+    if(Auth.isLoggedIn()){
+        await Store.init();
+        UI.init();
+    }
+});
     </script>
 </body>
 </html>
