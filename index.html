@@ -546,10 +546,10 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Photos en grille (2 colonnes max 54mm)
+                    // Photos en grille (agrandies)
                     const photos=(r.photos||[]).filter(p=>p);
-                    const photoW=26;
-                    const photoH=20;
+                    const photoW=28;
+                    const photoH=24;
                     if(photos.length>0){
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
