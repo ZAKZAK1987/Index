@@ -490,15 +490,15 @@ const UI={
                         pdf.line(M,rowY-2,W-M,rowY-2);
                     }
 
-                    // Numéro avec pastille colorée (bien centré)
+                    // Numéro avec pastille colorée (centré)
                     pdf.setFillColor(...sc);
                     const numX=colX.num+7;
                     const numY=rowY+12;
                     pdf.circle(numX,numY,6,'F');
-                    pdf.setFontSize(10);
+                    pdf.setFontSize(11);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(255,255,255);
-                    pdf.text(String(i+1),numX,numY+3,{align:'center'});
+                    pdf.text(String(i+1),numX,numY+1.5,{align:'center'});
 
                     // Niveau (ligne 1)
                     pdf.setFontSize(8);
