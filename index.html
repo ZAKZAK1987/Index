@@ -428,16 +428,16 @@ const UI={
                 }
 
                 // Pages des réserves - format tableau compact
-                const rowH=70; // Hauteur par réserve
+                const rowH=50; // Hauteur par réserve réduite
                 const headerY=25;
                 const contentStartY=35;
                 const maxRowsPerPage=Math.floor((H-contentStartY-15)/rowH);
                 let currentPage=1;
                 let rowOnPage=0;
 
-                // Colonnes: #(12) | Localisation(28) | Description(60) | Photos(55) | Entreprise(25)
-                const colX={num:M,loc:M+14,desc:M+42,photo:M+102,lot:M+160};
-                const colW={num:12,loc:28,desc:60,photo:55,lot:28};
+                // Colonnes bien espacées sans conflit
+                const colX={num:M,loc:M+14,desc:M+44,photo:M+100,lot:M+158};
+                const colW={num:12,loc:30,desc:56,photo:55,lot:30};
 
                 const drawTableHeader=(pageNum)=>{
                     pdf.setFillColor(255,255,255);
@@ -492,13 +492,13 @@ const UI={
 
                     // Numéro avec pastille colorée (bien centré)
                     pdf.setFillColor(...sc);
-                    const numX=colX.num+6;
-                    const numY=rowY+10;
+                    const numX=colX.num+7;
+                    const numY=rowY+12;
                     pdf.circle(numX,numY,6,'F');
                     pdf.setFontSize(10);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(255,255,255);
-                    pdf.text(String(i+1),numX,numY+3.5,{align:'center'});
+                    pdf.text(String(i+1),numX,numY+3,{align:'center'});
 
                     // Niveau (ligne 1)
                     pdf.setFontSize(8);
@@ -524,16 +524,17 @@ const UI={
                     pdf.roundedRect(colX.loc,rowY+22,statutW,7,2,2,'F');
                     pdf.text(statutLabel,colX.loc+statutW/2,rowY+26.8,{align:'center'});
 
-                    // Date sous le statut
+                    // Date sous le statut (même couleur que le statut)
                     if(r.dateLimite && (r.statut==='todo'||r.statut==='progress')){
-                        pdf.setFontSize(6);
-                        pdf.setFont('helvetica','normal');
-                        pdf.setTextColor(100,100,100);
+                        pdf.setFontSize(7);
+                        pdf.setFont('helvetica','bold');
+                        if(r.statut==='todo'){pdf.setTextColor(220,53,69);}
+                        else{pdf.setTextColor(230,126,34);}
                         pdf.text('Pour le: '+this.formatDate(r.dateLimite),colX.loc,rowY+35);
                     }
                     if(r.dateFait && r.statut==='done'){
-                        pdf.setFontSize(6);
-                        pdf.setFont('helvetica','normal');
+                        pdf.setFontSize(7);
+                        pdf.setFont('helvetica','bold');
                         pdf.setTextColor(39,174,96);
                         pdf.text('Fait le: '+this.formatDate(r.dateFait),colX.loc,rowY+35);
                     }
@@ -545,10 +546,10 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Photos en grille (agrandies)
+                    // Photos en grille (2 colonnes max 54mm)
                     const photos=(r.photos||[]).filter(p=>p);
-                    const photoW=40;
-                    const photoH=32;
+                    const photoW=26;
+                    const photoH=20;
                     if(photos.length>0){
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
