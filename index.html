@@ -397,38 +397,38 @@ const UI={
                     pdf.setFont('helvetica','bold');
                     pdf.text('PAR ENTREPRISE',M,y);
                     y+=6;
-                    pdf.setFontSize(7);
+                    pdf.setFontSize(9);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(150,150,150);
                     pdf.text('ENTREPRISE',M+3,y);
                     pdf.text('À FAIRE',M+70,y);
-                    pdf.text('EN COURS',M+95,y);
-                    pdf.text('TERMINÉ',M+120,y);
-                    pdf.text('TOTAL',M+145,y);
-                    y+=1;
+                    pdf.text('EN COURS',M+100,y);
+                    pdf.text('TERMINÉ',M+130,y);
+                    pdf.text('TOTAL',M+158,y);
+                    y+=2;
                     pdf.setDrawColor(220,220,220);
                     pdf.line(M,y,W-M,y);
-                    y+=5;
+                    y+=6;
                     pdf.setFont('helvetica','normal');
                     Object.entries(summary).forEach(([ent,c])=>{
                         pdf.setTextColor(26,26,26);
                         pdf.text(ent.substring(0,28),M+3,y);
                         pdf.setTextColor(220,53,69);
-                        pdf.text(String(c.todo||'-'),M+75,y);
+                        pdf.text(String(c.todo||'-'),M+78,y);
                         pdf.setTextColor(230,126,34);
-                        pdf.text(String(c.progress||'-'),M+102,y);
+                        pdf.text(String(c.progress||'-'),M+110,y);
                         pdf.setTextColor(39,174,96);
-                        pdf.text(String(c.done||'-'),M+125,y);
+                        pdf.text(String(c.done||'-'),M+138,y);
                         pdf.setTextColor(26,26,26);
                         pdf.setFont('helvetica','bold');
-                        pdf.text(String(c.total),M+148,y);
+                        pdf.text(String(c.total),M+162,y);
                         pdf.setFont('helvetica','normal');
-                        y+=6;
+                        y+=8;
                     });
                 }
 
                 // Pages des réserves - format tableau compact
-                const rowH=55; // Hauteur par réserve
+                const rowH=70; // Hauteur par réserve
                 const headerY=25;
                 const contentStartY=35;
                 const maxRowsPerPage=Math.floor((H-contentStartY-15)/rowH);
@@ -493,12 +493,12 @@ const UI={
                     // Numéro avec pastille colorée (bien centré)
                     pdf.setFillColor(...sc);
                     const numX=colX.num+6;
-                    const numY=rowY+8;
-                    pdf.circle(numX,numY,5,'F');
-                    pdf.setFontSize(9);
+                    const numY=rowY+10;
+                    pdf.circle(numX,numY,6,'F');
+                    pdf.setFontSize(10);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(255,255,255);
-                    pdf.text(String(i+1),numX,numY+3,{align:'center'});
+                    pdf.text(String(i+1),numX,numY+3.5,{align:'center'});
 
                     // Niveau (ligne 1)
                     pdf.setFontSize(8);
@@ -547,8 +547,8 @@ const UI={
 
                     // Photos en grille (agrandies)
                     const photos=(r.photos||[]).filter(p=>p);
-                    const photoW=35;
-                    const photoH=28;
+                    const photoW=40;
+                    const photoH=32;
                     if(photos.length>0){
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
