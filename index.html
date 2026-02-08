@@ -490,15 +490,15 @@ const UI={
                         pdf.line(M,rowY-2,W-M,rowY-2);
                     }
 
-                    // Numéro avec pastille colorée (petit, centré)
+                    // Numéro avec pastille colorée (même taille que entreprise)
                     pdf.setFillColor(...sc);
                     const numX=colX.num+5;
-                    const numY=rowY+8;
-                    pdf.circle(numX,numY,4,'F');
-                    pdf.setFontSize(9);
+                    const numY=rowY+7;
+                    pdf.circle(numX,numY,3.5,'F');
+                    pdf.setFontSize(8);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(255,255,255);
-                    pdf.text(String(i+1),numX,numY+0.8,{align:'center'});
+                    pdf.text(String(i+1),numX,numY+0.7,{align:'center'});
 
                     // Niveau (ligne 1)
                     pdf.setFontSize(8);
@@ -562,17 +562,16 @@ const UI={
                         });
                     }
 
-                    // Entreprise - badge bleu à droite (colonne lot)
+                    // Entreprise - badge bleu aligné sous header
                     if(r.entreprise){
                         const lotText=r.entreprise.substring(0,12);
                         pdf.setFontSize(8);
                         pdf.setFont('helvetica','bold');
-                        const lotW=pdf.getTextWidth(lotText)+8;
-                        const lotX=colX.lot+(colW.lot-lotW)/2; // Centré dans la colonne
+                        const lotW=pdf.getTextWidth(lotText)+6;
                         pdf.setFillColor(235,243,255);
-                        pdf.roundedRect(lotX,rowY+2,lotW,10,3,3,'F');
+                        pdf.roundedRect(colX.lot,rowY+2,lotW,9,2,2,'F');
                         pdf.setTextColor(59,91,170);
-                        pdf.text(lotText,lotX+lotW/2,rowY+9,{align:'center'});
+                        pdf.text(lotText,colX.lot+lotW/2,rowY+8,{align:'center'});
                     }
 
                     rowOnPage++;
