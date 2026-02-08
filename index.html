@@ -523,17 +523,24 @@ const UI={
                         pdf.text(dateText,colX.desc,rowY+45);
                     }
 
-                    // Photo (première photo seulement, grande)
+                    // Photos en grille (2x2 si plusieurs)
                     const photos=(r.photos||[]).filter(p=>p);
                     if(photos.length>0){
-                        try{
-                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,colW.photo,38);
-                            if(photos.length>1){
-                                pdf.setFontSize(6);
-                                pdf.setTextColor(100,100,100);
-                                pdf.text('+'+(photos.length-1)+' photo(s)',colX.photo,rowY+43);
-                            }
-                        }catch(e){}
+                        const photoW=colW.photo;
+                        const photoH=38;
+                        if(photos.length===1){
+                            try{pdf.addImage(photos[0],'JPEG',colX.photo,rowY,photoW,photoH);}catch(e){}
+                        }else{
+                            const halfW=(photoW-2)/2;
+                            const halfH=(photoH-2)/2;
+                            photos.slice(0,4).forEach((p,j)=>{
+                                try{
+                                    const px=colX.photo+(j%2)*(halfW+2);
+                                    const py=rowY+Math.floor(j/2)*(halfH+2);
+                                    pdf.addImage(p,'JPEG',px,py,halfW,halfH);
+                                }catch(e){}
+                            });
+                        }
                     }
 
                     // Lot (Entreprise)
