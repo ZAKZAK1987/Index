@@ -310,7 +310,263 @@ const UI={
     deleteReport(id){if(confirm('Supprimer ce rapport ?')){Store.deleteReport(id);this.renderHistorique()}},
     formatDate(d){if(!d)return'';return new Date(d).toLocaleDateString('fr-FR')},
     formatDateTime(d){if(!d)return'';const dt=new Date(d);return dt.toLocaleDateString('fr-FR')+' '+dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})},
-    generatePDF(){const btn=document.getElementById('btn-generate-pdf');btn.textContent='Génération...';btn.disabled=true;setTimeout(()=>{try{const{jsPDF}=window.jspdf;const pdf=new jsPDF('p','mm','a4');const W=210,H=297,M=20;const chantier=Store.data.currentChantier;const remarques=Store.data.remarques;const summary=Store.getSummaryByEntreprise();const stats=Store.getStats();const totalPages=remarques.length+1;pdf.setFillColor(247,247,245);pdf.rect(0,0,W,H,'F');pdf.setFillColor(91,155,244);pdf.roundedRect(M,M,16,16,3,3,'F');const lx=M+8,ly=M+8;pdf.setDrawColor(255,255,255);pdf.setLineWidth(1);pdf.line(lx-1,ly+5,lx-1,ly-4);pdf.line(lx-6,ly-4,lx+5,ly-4);pdf.line(lx-6,ly-4,lx-4,ly-6);pdf.line(lx+4,ly-4,lx+4,ly);pdf.line(lx+3,ly,lx+5,ly);pdf.line(lx-4,ly+5,lx+2,ly+5);pdf.setFillColor(255,255,255);pdf.rect(lx+2,ly,3,2,'F');pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor(102,102,102);pdf.text('Date de visite',W-M,M+6,{align:'right'});pdf.setFontSize(11);pdf.setTextColor(26,26,26);pdf.setFont('helvetica','bold');pdf.text(this.formatDate(chantier.dateVisite),W-M,M+13,{align:'right'});if(chantier.dateMiseAJour){pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor(102,102,102);pdf.text('Mise à jour',W-M,M+20,{align:'right'});pdf.setFontSize(11);pdf.setTextColor(26,26,26);pdf.setFont('helvetica','bold');pdf.text(this.formatDate(chantier.dateMiseAJour),W-M,M+27,{align:'right'})}let y=50;pdf.setFontSize(28);pdf.setFont('helvetica','bold');pdf.setTextColor(26,26,26);pdf.text('RAPPORT DE VISITE',M,y);pdf.text('DE CHANTIER',M,y+10);y+=30;pdf.setFillColor(255,255,255);pdf.roundedRect(M,y,W-M*2,52,4,4,'F');pdf.setDrawColor(229,229,229);pdf.roundedRect(M,y,W-M*2,52,4,4,'S');y+=12;pdf.setFontSize(9);const info=[['Chantier',chantier.nom||'–'],['Adresse',chantier.adresse||'–'],['MOA',chantier.mo||'–'],['MOE',chantier.moe||'–']];info.forEach(([label,val])=>{pdf.setFont('helvetica','normal');pdf.setTextColor(102,102,102);pdf.text(label+':',M+8,y);pdf.setTextColor(26,26,26);pdf.setFont('helvetica','bold');pdf.text(val.substring(0,45),M+35,y);y+=10});y+=10;pdf.setFontSize(9);pdf.setTextColor(153,153,153);pdf.setFont('helvetica','bold');pdf.text('SYNTHÈSE DES RÉSERVES',M,y);y+=10;const statW=(W-M*2-15)/4;pdf.setFillColor(255,255,255);pdf.roundedRect(M,y,statW,28,3,3,'F');pdf.roundedRect(M+statW+5,y,statW,28,3,3,'F');pdf.roundedRect(M+(statW+5)*2,y,statW,28,3,3,'F');pdf.roundedRect(M+(statW+5)*3,y,statW,28,3,3,'F');pdf.setFontSize(20);pdf.setFont('helvetica','bold');pdf.setTextColor(26,26,26);pdf.text(String(stats.total),M+statW/2,y+14,{align:'center'});pdf.setTextColor(220,53,69);pdf.text(String(stats.todo),M+statW+5+statW/2,y+14,{align:'center'});pdf.setTextColor(230,126,34);pdf.text(String(stats.progress),M+(statW+5)*2+statW/2,y+14,{align:'center'});pdf.setTextColor(39,174,96);pdf.text(String(stats.done),M+(statW+5)*3+statW/2,y+14,{align:'center'});pdf.setFontSize(7);pdf.setTextColor(153,153,153);pdf.setFont('helvetica','normal');pdf.text('TOTAL',M+statW/2,y+22,{align:'center'});pdf.text('À FAIRE',M+statW+5+statW/2,y+22,{align:'center'});pdf.text('EN COURS',M+(statW+5)*2+statW/2,y+22,{align:'center'});pdf.text('TERMINÉ',M+(statW+5)*3+statW/2,y+22,{align:'center'});y+=38;if(Object.keys(summary).length){pdf.setFontSize(9);pdf.setTextColor(153,153,153);pdf.setFont('helvetica','bold');pdf.text('PAR ENTREPRISE',M,y);y+=8;const tableH=8+Object.keys(summary).length*8;pdf.setFillColor(255,255,255);pdf.roundedRect(M,y,W-M*2,tableH,3,3,'F');y+=6;pdf.setFontSize(7);pdf.setFont('helvetica','bold');pdf.setTextColor(153,153,153);pdf.text('ENTREPRISE',M+5,y);pdf.text('À FAIRE',M+75,y);pdf.text('EN COURS',M+100,y);pdf.text('TERMINÉ',M+128,y);pdf.text('TOTAL',M+155,y);y+=6;Object.entries(summary).forEach(([ent,c])=>{pdf.setFont('helvetica','normal');pdf.setTextColor(26,26,26);pdf.text(ent.substring(0,30),M+5,y);pdf.setTextColor(220,53,69);pdf.text(String(c.todo||'–'),M+80,y);pdf.setTextColor(230,126,34);pdf.text(String(c.progress||'–'),M+108,y);pdf.setTextColor(39,174,96);pdf.text(String(c.done||'–'),M+133,y);pdf.setTextColor(26,26,26);pdf.setFont('helvetica','bold');pdf.text(String(c.total),M+158,y);y+=8})}pdf.setFontSize(7);pdf.setTextColor(153,153,153);pdf.text((chantier.nom||'Chantier')+' | Visite: '+this.formatDate(chantier.dateVisite)+' | Page 1/'+totalPages,W/2,H-10,{align:'center'});remarques.forEach((r,i)=>{pdf.addPage();pdf.setFillColor(247,247,245);pdf.rect(0,0,W,H,'F');const statusColors={todo:[220,53,69],progress:[230,126,34],done:[39,174,96]};const statusBg={todo:[255,235,235],progress:[255,245,235],done:[235,255,240]};const statusLabels={todo:'À FAIRE',progress:'EN COURS',done:'TERMINÉ'};const sc=statusColors[r.statut];const bg=statusBg[r.statut];y=M;pdf.setFillColor(...bg);pdf.roundedRect(M,y,W-M*2,H-M*2,4,4,'F');pdf.setFillColor(...sc);pdf.rect(M,y,4,H-M*2,'F');y+=15;pdf.setFillColor(26,26,26);pdf.roundedRect(M+15,y-6,20,10,2,2,'F');pdf.setFontSize(10);pdf.setTextColor(255,255,255);pdf.setFont('helvetica','bold');pdf.text('#'+(i+1),M+25,y+1,{align:'center'});pdf.setFillColor(...sc);pdf.roundedRect(M+40,y-6,25,10,2,2,'F');pdf.setTextColor(255,255,255);pdf.setFontSize(7);pdf.text(statusLabels[r.statut],M+52.5,y+1,{align:'center'});if(r.entreprise){const entW=Math.min(pdf.getTextWidth(r.entreprise)+10,50);pdf.setFillColor(247,247,245);pdf.roundedRect(W-M-entW-5,y-6,entW,10,2,2,'F');pdf.setTextColor(102,102,102);pdf.setFontSize(8);pdf.text(r.entreprise.substring(0,20),W-M-entW/2-5,y+1,{align:'center'})}y+=20;pdf.setFontSize(14);pdf.setTextColor(26,26,26);pdf.setFont('helvetica','bold');const descLines=pdf.splitTextToSize(r.description||'Sans description',W-M*2-30);pdf.text(descLines,M+15,y);y+=descLines.length*6+15;pdf.setFillColor(255,255,255);pdf.roundedRect(M+15,y,W-M*2-30,35,3,3,'F');y+=12;pdf.setFontSize(9);pdf.setFont('helvetica','normal');pdf.setTextColor(102,102,102);pdf.text('Localisation:',M+22,y);pdf.setTextColor(26,26,26);pdf.text(r.localisation||'–',M+55,y);pdf.setTextColor(102,102,102);pdf.text('Étage:',M+100,y);pdf.setTextColor(26,26,26);pdf.text(r.niveau||'–',M+120,y);y+=12;pdf.setTextColor(102,102,102);pdf.text('À faire:',M+22,y);pdf.setTextColor(26,26,26);pdf.text(this.formatDate(r.dateLimite)||'–',M+45,y);if(r.dateFait){pdf.setTextColor(102,102,102);pdf.text('Fait le:',M+100,y);pdf.setTextColor(26,26,26);pdf.text(this.formatDate(r.dateFait),M+125,y)}y+=25;const photos=(r.photos||[]).filter(p=>p);if(photos.length){pdf.setFontSize(9);pdf.setTextColor(153,153,153);pdf.setFont('helvetica','bold');pdf.text('PHOTOS ('+photos.length+')',M+15,y);y+=8;const avail=H-y-M-10;const contentW=W-M*2-30;if(photos.length===1){try{const img=new Image();img.src=photos[0];const ratio=img.width/img.height;let pw,ph;if(ratio>contentW/avail){pw=contentW;ph=contentW/ratio}else{ph=avail;pw=avail*ratio}pdf.addImage(photos[0],'JPEG',M+15+(contentW-pw)/2,y,pw,ph)}catch(e){}}else if(photos.length===2){const pw=(contentW-10)/2,ph=Math.min(avail,pw*0.75);photos.forEach((p,j)=>{try{pdf.addImage(p,'JPEG',M+15+j*(pw+10),y,pw,ph)}catch(e){}})}else{const pw=(contentW-10)/2,ph=Math.min((avail-10)/2,pw*0.75);photos.forEach((p,j)=>{try{pdf.addImage(p,'JPEG',M+15+(j%2)*(pw+10),y+Math.floor(j/2)*(ph+10),pw,ph)}catch(e){}})}}pdf.setFontSize(7);pdf.setTextColor(153,153,153);pdf.text((chantier.nom||'Chantier')+' | Visite: '+this.formatDate(chantier.dateVisite)+' | Page '+(i+2)+'/'+totalPages,W/2,H-10,{align:'center'})});const fileName='Rapport_'+(chantier.nom||'Chantier').replace(/[^a-zA-Z0-9]/g,'_')+'_'+(chantier.dateVisite||'').replace(/-/g,'')+(chantier.dateMiseAJour?'_MAJ_'+chantier.dateMiseAJour.replace(/-/g,''):'')+'.pdf';pdf.save(fileName);btn.textContent='Générer le PDF';btn.disabled=false}catch(e){console.error(e);alert('Erreur: '+e.message);btn.textContent='Générer le PDF';btn.disabled=false}},100)}
+    generatePDF(){
+        const btn=document.getElementById('btn-generate-pdf');
+        btn.textContent='Génération...';
+        btn.disabled=true;
+        setTimeout(()=>{
+            try{
+                const{jsPDF}=window.jspdf;
+                const pdf=new jsPDF('p','mm','a4');
+                const W=210,H=297,M=15;
+                const chantier=Store.data.currentChantier;
+                const remarques=Store.data.remarques;
+                const summary=Store.getSummaryByEntreprise();
+                const stats=Store.getStats();
+                const statusColors={todo:[220,53,69],progress:[230,126,34],done:[39,174,96]};
+
+                // Page 1: Couverture
+                pdf.setFillColor(255,255,255);
+                pdf.rect(0,0,W,H,'F');
+
+                // Logo
+                pdf.setFillColor(91,155,244);
+                pdf.roundedRect(M,M,14,14,2,2,'F');
+                const lx=M+7,ly=M+7;
+                pdf.setDrawColor(255,255,255);
+                pdf.setLineWidth(0.8);
+                pdf.line(lx-1,ly+4,lx-1,ly-3);
+                pdf.line(lx-5,ly-3,lx+4,ly-3);
+                pdf.line(lx-5,ly-3,lx-3,ly-5);
+
+                // Date
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica','normal');
+                pdf.setTextColor(102,102,102);
+                pdf.text('Visite: '+this.formatDate(chantier.dateVisite)+(chantier.dateMiseAJour?' | MAJ: '+this.formatDate(chantier.dateMiseAJour):''),W-M,M+8,{align:'right'});
+
+                // Titre
+                let y=45;
+                pdf.setFontSize(22);
+                pdf.setFont('helvetica','bold');
+                pdf.setTextColor(26,26,26);
+                pdf.text('RAPPORT DE VISITE DE CHANTIER',M,y);
+
+                // Infos chantier
+                y+=15;
+                pdf.setFillColor(248,248,248);
+                pdf.roundedRect(M,y,W-M*2,40,3,3,'F');
+                y+=10;
+                pdf.setFontSize(9);
+                const info=[['Chantier',chantier.nom||'–'],['Adresse',chantier.adresse||'–'],['MOA',chantier.mo||'–'],['MOE',chantier.moe||'–']];
+                info.forEach(([label,val])=>{
+                    pdf.setFont('helvetica','normal');
+                    pdf.setTextColor(102,102,102);
+                    pdf.text(label+':',M+5,y);
+                    pdf.setTextColor(26,26,26);
+                    pdf.setFont('helvetica','bold');
+                    pdf.text(val.substring(0,50),M+30,y);
+                    y+=8;
+                });
+
+                // Stats
+                y+=10;
+                pdf.setFontSize(10);
+                pdf.setTextColor(100,100,100);
+                pdf.setFont('helvetica','bold');
+                pdf.text('SYNTHESE',M,y);
+                y+=8;
+                const statW=(W-M*2-12)/4;
+                [[stats.total,'Total',[26,26,26]],[stats.todo,'À faire',[220,53,69]],[stats.progress,'En cours',[230,126,34]],[stats.done,'Terminé',[39,174,96]]].forEach(([val,label,col],i)=>{
+                    pdf.setFillColor(248,248,248);
+                    pdf.roundedRect(M+i*(statW+4),y,statW,22,2,2,'F');
+                    pdf.setFontSize(16);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(...col);
+                    pdf.text(String(val),M+i*(statW+4)+statW/2,y+12,{align:'center'});
+                    pdf.setFontSize(7);
+                    pdf.setTextColor(120,120,120);
+                    pdf.text(label,M+i*(statW+4)+statW/2,y+18,{align:'center'});
+                });
+
+                // Tableau par entreprise
+                y+=32;
+                if(Object.keys(summary).length){
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100,100,100);
+                    pdf.setFont('helvetica','bold');
+                    pdf.text('PAR ENTREPRISE',M,y);
+                    y+=6;
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(150,150,150);
+                    pdf.text('ENTREPRISE',M+3,y);
+                    pdf.text('À FAIRE',M+70,y);
+                    pdf.text('EN COURS',M+95,y);
+                    pdf.text('TERMINÉ',M+120,y);
+                    pdf.text('TOTAL',M+145,y);
+                    y+=1;
+                    pdf.setDrawColor(220,220,220);
+                    pdf.line(M,y,W-M,y);
+                    y+=5;
+                    pdf.setFont('helvetica','normal');
+                    Object.entries(summary).forEach(([ent,c])=>{
+                        pdf.setTextColor(26,26,26);
+                        pdf.text(ent.substring(0,28),M+3,y);
+                        pdf.setTextColor(220,53,69);
+                        pdf.text(String(c.todo||'-'),M+75,y);
+                        pdf.setTextColor(230,126,34);
+                        pdf.text(String(c.progress||'-'),M+102,y);
+                        pdf.setTextColor(39,174,96);
+                        pdf.text(String(c.done||'-'),M+125,y);
+                        pdf.setTextColor(26,26,26);
+                        pdf.setFont('helvetica','bold');
+                        pdf.text(String(c.total),M+148,y);
+                        pdf.setFont('helvetica','normal');
+                        y+=6;
+                    });
+                }
+
+                // Pages des réserves - format tableau compact
+                const rowH=55; // Hauteur par réserve
+                const headerY=25;
+                const contentStartY=35;
+                const maxRowsPerPage=Math.floor((H-contentStartY-15)/rowH);
+                let currentPage=1;
+                let rowOnPage=0;
+
+                // Colonnes: #(15) | Localisation(25) | Description(65) | Photo(50) | Lot(25)
+                const colX={num:M,loc:M+12,desc:M+40,photo:M+110,lot:M+165};
+                const colW={num:10,loc:25,desc:68,photo:50,lot:25};
+
+                const drawTableHeader=(pageNum)=>{
+                    pdf.setFillColor(255,255,255);
+                    pdf.rect(0,0,W,H,'F');
+
+                    // Titre page
+                    pdf.setFontSize(11);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(26,26,26);
+                    pdf.text((chantier.nom||'CHANTIER').toUpperCase(),M,18);
+
+                    // Date en haut à droite
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica','normal');
+                    pdf.setTextColor(100,100,100);
+                    pdf.text('Visite: '+this.formatDate(chantier.dateVisite),W-M,18,{align:'right'});
+
+                    // Header tableau
+                    pdf.setFillColor(245,245,245);
+                    pdf.rect(M,headerY,W-M*2,8,'F');
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(100,100,100);
+                    pdf.text('#',colX.num+3,headerY+5);
+                    pdf.text('Localisation',colX.loc,headerY+5);
+                    pdf.text('Description',colX.desc,headerY+5);
+                    pdf.text('Photos',colX.photo,headerY+5);
+                    pdf.text('Lot',colX.lot,headerY+5);
+
+                    // Ligne sous header
+                    pdf.setDrawColor(200,200,200);
+                    pdf.line(M,headerY+8,W-M,headerY+8);
+                };
+
+                remarques.forEach((r,i)=>{
+                    // Nouvelle page si nécessaire
+                    if(rowOnPage===0||rowOnPage>=maxRowsPerPage){
+                        if(currentPage>1||rowOnPage>0)pdf.addPage();
+                        currentPage++;
+                        rowOnPage=0;
+                        drawTableHeader(currentPage);
+                    }
+
+                    const rowY=contentStartY+rowOnPage*rowH;
+                    const sc=statusColors[r.statut]||[100,100,100];
+
+                    // Ligne séparatrice
+                    if(rowOnPage>0){
+                        pdf.setDrawColor(230,230,230);
+                        pdf.line(M,rowY-2,W-M,rowY-2);
+                    }
+
+                    // Numéro avec pastille colorée
+                    pdf.setFillColor(...sc);
+                    pdf.circle(colX.num+5,rowY+5,4,'F');
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(255,255,255);
+                    pdf.text(String(i+1),colX.num+5,rowY+6.5,{align:'center'});
+
+                    // Localisation + Étage
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica','bold');
+                    pdf.setTextColor(26,26,26);
+                    const locText=(r.niveau||'')+(r.niveau&&r.localisation?' - ':'')+(r.localisation||'');
+                    const locLines=pdf.splitTextToSize(locText||'-',colW.loc);
+                    pdf.text(locLines.slice(0,3),colX.loc,rowY+5);
+
+                    // Description
+                    pdf.setFontSize(9);
+                    pdf.setFont('helvetica','normal');
+                    pdf.setTextColor(26,26,26);
+                    const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
+                    pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
+
+                    // Dates si présentes
+                    if(r.dateLimite||r.dateFait){
+                        pdf.setFontSize(7);
+                        pdf.setTextColor(120,120,120);
+                        let dateText='';
+                        if(r.dateLimite)dateText+='Prévu: '+this.formatDate(r.dateLimite);
+                        if(r.dateFait)dateText+=(dateText?' | ':'')+'Fait: '+this.formatDate(r.dateFait);
+                        pdf.text(dateText,colX.desc,rowY+45);
+                    }
+
+                    // Photo (première photo seulement, grande)
+                    const photos=(r.photos||[]).filter(p=>p);
+                    if(photos.length>0){
+                        try{
+                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,colW.photo,38);
+                            if(photos.length>1){
+                                pdf.setFontSize(6);
+                                pdf.setTextColor(100,100,100);
+                                pdf.text('+'+(photos.length-1)+' photo(s)',colX.photo,rowY+43);
+                            }
+                        }catch(e){}
+                    }
+
+                    // Lot (Entreprise)
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica','normal');
+                    pdf.setTextColor(80,80,80);
+                    const lotLines=pdf.splitTextToSize(r.entreprise||'-',colW.lot);
+                    pdf.text(lotLines.slice(0,3),colX.lot,rowY+5);
+
+                    rowOnPage++;
+                });
+
+                // Numéros de page
+                const totalPages=currentPage;
+                for(let p=1;p<=totalPages;p++){
+                    pdf.setPage(p);
+                    pdf.setFontSize(7);
+                    pdf.setTextColor(150,150,150);
+                    pdf.text('Page '+p+'/'+totalPages,W/2,H-8,{align:'center'});
+                }
+
+                const fileName='Rapport_'+(chantier.nom||'Chantier').replace(/[^a-zA-Z0-9]/g,'_')+'_'+(chantier.dateVisite||'').replace(/-/g,'')+(chantier.dateMiseAJour?'_MAJ_'+chantier.dateMiseAJour.replace(/-/g,''):'')+'.pdf';
+                pdf.save(fileName);
+                btn.textContent='Générer le PDF';
+                btn.disabled=false;
+            }catch(e){
+                console.error(e);
+                alert('Erreur: '+e.message);
+                btn.textContent='Générer le PDF';
+                btn.disabled=false;
+            }
+        },100);
+    }
 };
 const Auth={
     credentials:{user:'admin',pass:'chantier2026'},
