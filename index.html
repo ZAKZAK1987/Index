@@ -524,6 +524,20 @@ const UI={
                     pdf.roundedRect(colX.loc,rowY+22,statutW,7,2,2,'F');
                     pdf.text(statutLabel,colX.loc+statutW/2,rowY+26.8,{align:'center'});
 
+                    // Date sous le statut
+                    if(r.dateLimite && (r.statut==='todo'||r.statut==='progress')){
+                        pdf.setFontSize(6);
+                        pdf.setFont('helvetica','normal');
+                        pdf.setTextColor(100,100,100);
+                        pdf.text('Pour le: '+this.formatDate(r.dateLimite),colX.loc,rowY+35);
+                    }
+                    if(r.dateFait && r.statut==='done'){
+                        pdf.setFontSize(6);
+                        pdf.setFont('helvetica','normal');
+                        pdf.setTextColor(39,174,96);
+                        pdf.text('Fait le: '+this.formatDate(r.dateFait),colX.loc,rowY+35);
+                    }
+
                     // Description
                     pdf.setFontSize(9);
                     pdf.setFont('helvetica','normal');
@@ -531,35 +545,10 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Date "À faire" avec couleur selon statut
-                    if(r.dateLimite){
-                        const dateText='À faire: '+this.formatDate(r.dateLimite);
-                        pdf.setFontSize(7);
-                        const dateW=pdf.getTextWidth(dateText)+6;
-                        // Couleur selon statut (rouge=todo, orange=progress, vert=done)
-                        if(r.statut==='todo'){pdf.setFillColor(255,235,235);pdf.setTextColor(220,53,69);}
-                        else if(r.statut==='progress'){pdf.setFillColor(255,245,235);pdf.setTextColor(230,126,34);}
-                        else{pdf.setFillColor(235,255,243);pdf.setTextColor(39,174,96);}
-                        pdf.roundedRect(colX.desc,rowY+42,dateW,8,2,2,'F');
-                        pdf.setFont('helvetica','bold');
-                        pdf.text(dateText,colX.desc+dateW/2,rowY+47,{align:'center'});
-                    }
-                    if(r.dateFait){
-                        const faitText='Fait: '+this.formatDate(r.dateFait);
-                        pdf.setFontSize(7);
-                        const faitW=pdf.getTextWidth(faitText)+6;
-                        const faitX=r.dateLimite?colX.desc+pdf.getTextWidth('À faire: '+this.formatDate(r.dateLimite))+12:colX.desc;
-                        pdf.setFillColor(235,255,243);
-                        pdf.roundedRect(faitX,rowY+42,faitW,8,2,2,'F');
-                        pdf.setFont('helvetica','bold');
-                        pdf.setTextColor(39,174,96);
-                        pdf.text(faitText,faitX+faitW/2,rowY+47,{align:'center'});
-                    }
-
                     // Photos en grille (agrandies)
                     const photos=(r.photos||[]).filter(p=>p);
-                    const photoW=27;
-                    const photoH=22;
+                    const photoW=35;
+                    const photoH=28;
                     if(photos.length>0){
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
