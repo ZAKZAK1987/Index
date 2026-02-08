@@ -465,7 +465,7 @@ const UI={
                     pdf.text('Localisation',colX.loc,headerY+5);
                     pdf.text('Description',colX.desc,headerY+5);
                     pdf.text('Photos',colX.photo,headerY+5);
-                    pdf.text('Lot',colX.lot,headerY+5);
+                    pdf.text('Entreprise',colX.lot,headerY+5);
 
                     // Ligne sous header
                     pdf.setDrawColor(200,200,200);
@@ -505,6 +505,17 @@ const UI={
                     const locText=(r.niveau||'')+(r.niveau&&r.localisation?' - ':'')+(r.localisation||'');
                     const locLines=pdf.splitTextToSize(locText||'-',colW.loc);
                     pdf.text(locLines.slice(0,3),colX.loc,rowY+5);
+
+                    // Statut sous la localisation
+                    const statutLabel=r.statut==='todo'?'À faire':r.statut==='progress'?'En cours':'Terminé';
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica','bold');
+                    const statutW=pdf.getTextWidth(statutLabel)+4;
+                    if(r.statut==='todo'){pdf.setFillColor(255,235,235);pdf.setTextColor(220,53,69);}
+                    else if(r.statut==='progress'){pdf.setFillColor(255,245,235);pdf.setTextColor(230,126,34);}
+                    else{pdf.setFillColor(235,255,243);pdf.setTextColor(39,174,96);}
+                    pdf.roundedRect(colX.loc,rowY+18,statutW,7,2,2,'F');
+                    pdf.text(statutLabel,colX.loc+statutW/2,rowY+22.8,{align:'center'});
 
                     // Description
                     pdf.setFontSize(9);
