@@ -518,7 +518,7 @@ const UI={
                         pdf.setFontSize(7);
                         pdf.setTextColor(120,120,120);
                         let dateText='';
-                        if(r.dateLimite)dateText+='Prévu: '+this.formatDate(r.dateLimite);
+                        if(r.dateLimite)dateText+='À faire: '+this.formatDate(r.dateLimite);
                         if(r.dateFait)dateText+=(dateText?' | ':'')+'Fait: '+this.formatDate(r.dateFait);
                         pdf.text(dateText,colX.desc,rowY+45);
                     }
@@ -539,12 +539,17 @@ const UI={
                         });
                     }
 
-                    // Lot (Entreprise)
-                    pdf.setFontSize(8);
-                    pdf.setFont('helvetica','normal');
-                    pdf.setTextColor(80,80,80);
-                    const lotLines=pdf.splitTextToSize(r.entreprise||'-',colW.lot);
-                    pdf.text(lotLines.slice(0,3),colX.lot,rowY+5);
+                    // Lot (Entreprise) - Badge bleu
+                    if(r.entreprise){
+                        const lotText=r.entreprise.substring(0,15);
+                        const lotW=Math.min(pdf.getTextWidth(lotText)+8,colW.lot);
+                        pdf.setFillColor(235,243,255); // Fond bleu clair
+                        pdf.roundedRect(colX.lot,rowY,lotW,10,3,3,'F');
+                        pdf.setFontSize(8);
+                        pdf.setFont('helvetica','bold');
+                        pdf.setTextColor(59,91,170); // Texte bleu foncé
+                        pdf.text(lotText,colX.lot+4,rowY+7);
+                    }
 
                     rowOnPage++;
                 });
