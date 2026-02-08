@@ -475,10 +475,10 @@ const UI={
                 remarques.forEach((r,i)=>{
                     // Nouvelle page si nécessaire
                     if(rowOnPage===0||rowOnPage>=maxRowsPerPage){
-                        if(currentPage>1||rowOnPage>0)pdf.addPage();
+                        pdf.addPage(); // Toujours ajouter une nouvelle page
                         currentPage++;
                         rowOnPage=0;
-                        drawTableHeader(currentPage);
+                        drawTableHeader();
                     }
 
                     const rowY=contentStartY+rowOnPage*rowH;
