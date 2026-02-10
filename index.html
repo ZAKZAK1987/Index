@@ -546,33 +546,30 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Photos adaptatives selon le nombre
+                    // Photos adaptatives selon le nombre (ratio 4:3 préservé)
                     const photos=(r.photos||[]).filter(p=>p);
-                    const maxPhotoW=57; // Largeur max zone photos
-                    const maxPhotoH=48; // Hauteur max zone photos
                     if(photos.length===1){
-                        // 1 photo = toute la zone
+                        // 1 photo = grande, ratio 4:3
                         try{
-                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,maxPhotoW,maxPhotoH);
+                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,55,42);
                         }catch(e){}
                     }else if(photos.length===2){
-                        // 2 photos côte à côte, pleine hauteur
-                        const pw=(maxPhotoW-1)/2;
+                        // 2 photos empilées, ratio 4:3
                         photos.forEach((p,j)=>{
                             try{
-                                pdf.addImage(p,'JPEG',colX.photo+j*(pw+1),rowY,pw,maxPhotoH);
+                                pdf.addImage(p,'JPEG',colX.photo,rowY+j*22,55,20);
                             }catch(e){}
                         });
                     }else if(photos.length>0){
-                        // 3-4 photos en grille 2x2
-                        const photoW=28;
-                        const photoH=24;
+                        // 3-4 photos en grille 2x2, ratio 4:3
+                        const photoW=27;
+                        const photoH=20;
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
                                 const col=j%2;
                                 const row=Math.floor(j/2);
                                 const px=colX.photo+col*(photoW+1);
-                                const py=rowY+row*(photoH+1);
+                                const py=rowY+row*(photoH+2);
                                 pdf.addImage(p,'JPEG',px,py,photoW,photoH);
                             }catch(e){}
                         });
