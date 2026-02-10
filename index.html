@@ -546,31 +546,41 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Photos adaptatives selon le nombre (ratio 4:3 préservé)
+                    // Photos avec ratio original préservé
                     const photos=(r.photos||[]).filter(p=>p);
-                    if(photos.length===1){
-                        // 1 photo = grande, ratio 4:3
+                    const fitImage=(img,maxW,maxH)=>{
                         try{
-                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,55,42);
+                            const props=pdf.getImageProperties(img);
+                            const ratio=props.width/props.height;
+                            let w=maxW,h=maxW/ratio;
+                            if(h>maxH){h=maxH;w=maxH*ratio;}
+                            return{w,h};
+                        }catch(e){return{w:maxW,h:maxH};}
+                    };
+                    if(photos.length===1){
+                        // 1 photo = grande, ratio préservé
+                        try{
+                            const dim=fitImage(photos[0],55,45);
+                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,dim.w,dim.h);
                         }catch(e){}
                     }else if(photos.length===2){
-                        // 2 photos empilées, ratio 4:3
+                        // 2 photos empilées
                         photos.forEach((p,j)=>{
                             try{
-                                pdf.addImage(p,'JPEG',colX.photo,rowY+j*22,55,20);
+                                const dim=fitImage(p,55,22);
+                                pdf.addImage(p,'JPEG',colX.photo,rowY+j*23,dim.w,dim.h);
                             }catch(e){}
                         });
                     }else if(photos.length>0){
-                        // 3-4 photos en grille 2x2, ratio 4:3
-                        const photoW=27;
-                        const photoH=20;
+                        // 3-4 photos en grille 2x2
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
                                 const col=j%2;
                                 const row=Math.floor(j/2);
-                                const px=colX.photo+col*(photoW+1);
-                                const py=rowY+row*(photoH+2);
-                                pdf.addImage(p,'JPEG',px,py,photoW,photoH);
+                                const dim=fitImage(p,27,22);
+                                const px=colX.photo+col*28;
+                                const py=rowY+row*23;
+                                pdf.addImage(p,'JPEG',px,py,dim.w,dim.h);
                             }catch(e){}
                         });
                     }
