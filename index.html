@@ -546,11 +546,27 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
 
-                    // Photos en grille (agrandies)
+                    // Photos adaptatives selon le nombre
                     const photos=(r.photos||[]).filter(p=>p);
-                    const photoW=28;
-                    const photoH=24;
-                    if(photos.length>0){
+                    const maxPhotoW=57; // Largeur max zone photos
+                    const maxPhotoH=48; // Hauteur max zone photos
+                    if(photos.length===1){
+                        // 1 photo = toute la zone
+                        try{
+                            pdf.addImage(photos[0],'JPEG',colX.photo,rowY,maxPhotoW,maxPhotoH);
+                        }catch(e){}
+                    }else if(photos.length===2){
+                        // 2 photos côte à côte, pleine hauteur
+                        const pw=(maxPhotoW-1)/2;
+                        photos.forEach((p,j)=>{
+                            try{
+                                pdf.addImage(p,'JPEG',colX.photo+j*(pw+1),rowY,pw,maxPhotoH);
+                            }catch(e){}
+                        });
+                    }else if(photos.length>0){
+                        // 3-4 photos en grille 2x2
+                        const photoW=28;
+                        const photoH=24;
                         photos.slice(0,4).forEach((p,j)=>{
                             try{
                                 const col=j%2;
