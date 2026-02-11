@@ -435,9 +435,9 @@ const UI={
                 let currentPage=1;
                 let rowOnPage=0;
 
-                // Colonnes bien espacées sans conflit
-                const colX={num:M,loc:M+14,desc:M+44,photo:M+100,lot:M+158};
-                const colW={num:12,loc:30,desc:56,photo:55,lot:30};
+                // Colonnes bien espacées et alignées
+                const colX={num:M,loc:M+15,desc:M+52,photo:M+108,lot:M+160};
+                const colW={num:13,loc:35,desc:54,photo:50,lot:30};
 
                 const drawTableHeader=(pageNum)=>{
                     pdf.setFillColor(255,255,255);
@@ -461,11 +461,11 @@ const UI={
                     pdf.setFontSize(7);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(100,100,100);
-                    pdf.text('#',colX.num+6,headerY+5,{align:'center'});
+                    pdf.text('#',colX.num+colW.num/2,headerY+5,{align:'center'});
                     pdf.text('Localisation',colX.loc,headerY+5);
                     pdf.text('Description',colX.desc,headerY+5);
                     pdf.text('Photos',colX.photo,headerY+5);
-                    pdf.text('Entreprise',colX.lot,headerY+5);
+                    pdf.text('Entreprise',colX.lot+colW.lot/2,headerY+5,{align:'center'});
 
                     // Ligne sous header
                     pdf.setDrawColor(200,200,200);
@@ -490,28 +490,28 @@ const UI={
                         pdf.line(M,rowY-2,W-M,rowY-2);
                     }
 
-                    // Numéro avec pastille colorée (même taille que entreprise)
+                    // Numéro avec pastille colorée centrée
                     pdf.setFillColor(...sc);
-                    const numX=colX.num+5;
-                    const numY=rowY+7;
-                    pdf.circle(numX,numY,3.5,'F');
-                    pdf.setFontSize(8);
+                    const numX=colX.num+colW.num/2;
+                    const numY=rowY+8;
+                    pdf.circle(numX,numY,4,'F');
+                    pdf.setFontSize(9);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(255,255,255);
-                    pdf.text(String(i+1),numX,numY+0.7,{align:'center'});
+                    pdf.text(String(i+1),numX,numY+1,{align:'center'});
 
-                    // Niveau (ligne 1)
-                    pdf.setFontSize(8);
+                    // Niveau (ligne 1) - gras
+                    pdf.setFontSize(9);
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(26,26,26);
-                    pdf.text(r.niveau||'-',colX.loc,rowY+5);
+                    pdf.text(r.niveau||'-',colX.loc,rowY+6);
 
                     // Localisation (ligne 2)
                     pdf.setFontSize(8);
                     pdf.setFont('helvetica','normal');
                     pdf.setTextColor(60,60,60);
                     const locLines=pdf.splitTextToSize(r.localisation||'-',colW.loc);
-                    pdf.text(locLines.slice(0,2),colX.loc,rowY+12);
+                    pdf.text(locLines.slice(0,2),colX.loc,rowY+14);
 
                     // Statut (ligne 3) - badge coloré
                     const statutLabel=r.statut==='todo'?'À faire':r.statut==='progress'?'En cours':'Terminé';
@@ -521,8 +521,8 @@ const UI={
                     if(r.statut==='todo'){pdf.setFillColor(255,235,235);pdf.setTextColor(220,53,69);}
                     else if(r.statut==='progress'){pdf.setFillColor(255,245,235);pdf.setTextColor(230,126,34);}
                     else{pdf.setFillColor(235,255,243);pdf.setTextColor(39,174,96);}
-                    pdf.roundedRect(colX.loc,rowY+22,statutW,7,2,2,'F');
-                    pdf.text(statutLabel,colX.loc+statutW/2,rowY+26.8,{align:'center'});
+                    pdf.roundedRect(colX.loc,rowY+28,statutW,7,2,2,'F');
+                    pdf.text(statutLabel,colX.loc+statutW/2,rowY+33,{align:'center'});
 
                     // Date sous le statut (même couleur que le statut)
                     if(r.dateLimite && (r.statut==='todo'||r.statut==='progress')){
@@ -530,13 +530,13 @@ const UI={
                         pdf.setFont('helvetica','bold');
                         if(r.statut==='todo'){pdf.setTextColor(220,53,69);}
                         else{pdf.setTextColor(230,126,34);}
-                        pdf.text('Pour le: '+this.formatDate(r.dateLimite),colX.loc,rowY+35);
+                        pdf.text('Pour le: '+this.formatDate(r.dateLimite),colX.loc,rowY+42);
                     }
                     if(r.dateFait && r.statut==='done'){
                         pdf.setFontSize(7);
                         pdf.setFont('helvetica','bold');
                         pdf.setTextColor(39,174,96);
-                        pdf.text('Fait le: '+this.formatDate(r.dateFait),colX.loc,rowY+35);
+                        pdf.text('Fait le: '+this.formatDate(r.dateFait),colX.loc,rowY+42);
                     }
 
                     // Description
@@ -544,7 +544,7 @@ const UI={
                     pdf.setFont('helvetica','normal');
                     pdf.setTextColor(26,26,26);
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
-                    pdf.text(descLines.slice(0,6),colX.desc,rowY+5);
+                    pdf.text(descLines.slice(0,7),colX.desc,rowY+6);
 
                     // Photo unique avec ratio préservé
                     const photo=r.photos?.length?r.photos[0]:null;
@@ -552,22 +552,23 @@ const UI={
                         try{
                             const props=pdf.getImageProperties(photo);
                             const ratio=props.width/props.height;
-                            let w=55,h=55/ratio;
-                            if(h>58){h=58;w=58*ratio;}
-                            pdf.addImage(photo,'JPEG',colX.photo,rowY,w,h);
+                            let w=colW.photo,h=colW.photo/ratio;
+                            if(h>60){h=60;w=60*ratio;}
+                            pdf.addImage(photo,'JPEG',colX.photo,rowY+2,w,h);
                         }catch(e){}
                     }
 
-                    // Entreprise - badge bleu aligné sous header
+                    // Entreprise - badge bleu centré sous header "Entreprise"
                     if(r.entreprise){
-                        const lotText=r.entreprise.substring(0,12);
+                        const lotText=r.entreprise.substring(0,14);
                         pdf.setFontSize(8);
                         pdf.setFont('helvetica','bold');
-                        const lotW=pdf.getTextWidth(lotText)+6;
+                        const lotW=pdf.getTextWidth(lotText)+8;
+                        const lotCenterX=colX.lot+colW.lot/2;
                         pdf.setFillColor(235,243,255);
-                        pdf.roundedRect(colX.lot,rowY+2,lotW,9,2,2,'F');
+                        pdf.roundedRect(lotCenterX-lotW/2,rowY+2,lotW,10,2,2,'F');
                         pdf.setTextColor(59,91,170);
-                        pdf.text(lotText,colX.lot+lotW/2,rowY+8,{align:'center'});
+                        pdf.text(lotText,lotCenterX,rowY+9,{align:'center'});
                     }
 
                     rowOnPage++;
