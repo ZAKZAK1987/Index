@@ -455,8 +455,8 @@ const UI={
                 let rowOnPage=0;
 
                 // Colonnes bien espacées et alignées
-                const colX={num:M,loc:M+15,desc:M+52,photo:M+108,lot:M+160};
-                const colW={num:13,loc:35,desc:54,photo:50,lot:30};
+                const colX={num:M,loc:M+12,desc:M+47,photo:M+105,lot:M+158};
+                const colW={num:10,loc:33,desc:56,photo:50,lot:32};
 
                 const drawTableHeader=(pageNum)=>{
                     pdf.setFillColor(255,255,255);
@@ -481,9 +481,9 @@ const UI={
                     pdf.setFont('helvetica','bold');
                     pdf.setTextColor(100,100,100);
                     pdf.text('#',colX.num+colW.num/2,headerY+5,{align:'center'});
-                    pdf.text('Localisation',colX.loc,headerY+5);
-                    pdf.text('Description',colX.desc,headerY+5);
-                    pdf.text('Photos',colX.photo,headerY+5);
+                    pdf.text('Localisation',colX.loc+2,headerY+5);
+                    pdf.text('Description',colX.desc+2,headerY+5);
+                    pdf.text('Photo',colX.photo+colW.photo/2,headerY+5,{align:'center'});
                     pdf.text('Entreprise',colX.lot+colW.lot/2,headerY+5,{align:'center'});
 
                     // Ligne sous header
@@ -565,29 +565,41 @@ const UI={
                     const descLines=pdf.splitTextToSize(r.description||'-',colW.desc);
                     pdf.text(descLines.slice(0,7),colX.desc,rowY+6);
 
-                    // Photo unique avec ratio préservé
+                    // Photo unique avec ratio préservé et contrainte dans la colonne
                     const photo=r.photos?.length?r.photos[0]:null;
                     if(photo){
                         try{
                             const props=pdf.getImageProperties(photo);
                             const ratio=props.width/props.height;
-                            let w=colW.photo,h=colW.photo/ratio;
-                            if(h>60){h=60;w=60*ratio;}
-                            pdf.addImage(photo,'JPEG',colX.photo,rowY+2,w,h);
+                            const maxW=colW.photo-2;
+                            const maxH=rowH-8;
+                            let w,h;
+                            if(ratio>1){
+                                w=Math.min(maxW,maxH*ratio);
+                                h=w/ratio;
+                            }else{
+                                h=Math.min(maxH,maxW/ratio);
+                                w=h*ratio;
+                            }
+                            if(w>maxW){w=maxW;h=w/ratio;}
+                            if(h>maxH){h=maxH;w=h*ratio;}
+                            const photoX=colX.photo+(colW.photo-w)/2;
+                            pdf.addImage(photo,'JPEG',photoX,rowY+2,w,h);
                         }catch(e){}
                     }
 
-                    // Entreprise - badge bleu centré sous header "Entreprise"
+                    // Entreprise - badge bleu centré verticalement dans la ligne
                     if(r.entreprise){
-                        const lotText=r.entreprise.substring(0,14);
+                        const lotText=r.entreprise.substring(0,12);
                         pdf.setFontSize(8);
                         pdf.setFont('helvetica','bold');
-                        const lotW=pdf.getTextWidth(lotText)+8;
+                        const lotW=pdf.getTextWidth(lotText)+10;
                         const lotCenterX=colX.lot+colW.lot/2;
+                        const lotY=rowY+rowH/2-5;
                         pdf.setFillColor(235,243,255);
-                        pdf.roundedRect(lotCenterX-lotW/2,rowY+2,lotW,10,2,2,'F');
+                        pdf.roundedRect(lotCenterX-lotW/2,lotY,lotW,10,3,3,'F');
                         pdf.setTextColor(59,91,170);
-                        pdf.text(lotText,lotCenterX,rowY+9,{align:'center'});
+                        pdf.text(lotText,lotCenterX,lotY+7,{align:'center'});
                     }
 
                     rowOnPage++;
