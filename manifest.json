@@ -4,8 +4,8 @@
   "description": "Application de gestion pour librairie-papeterie - Ain Temouchent",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f7fafc",
-  "theme_color": "#1a365d",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
   "orientation": "portrait-primary",
   "icons": [
     {
