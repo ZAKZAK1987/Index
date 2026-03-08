@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#6366f1">
+    <meta name="theme-color" content="#1a365d">
     <title>ÉCRILUXE - Gestion Librairie-Papeterie</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 
@@ -27,30 +24,24 @@
         }
 
         :root {
-            --primary: #6366f1;
-            --primary-light: #818cf8;
-            --primary-dark: #4f46e5;
-            --accent: #14b8a6;
-            --accent-light: #2dd4bf;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --background: #f8fafc;
+            --primary: #1a365d;
+            --primary-light: #2c5282;
+            --primary-dark: #0f2744;
+            --accent: #d69e2e;
+            --accent-light: #ecc94b;
+            --success: #38a169;
+            --warning: #dd6b20;
+            --danger: #e53e3e;
+            --background: #f7fafc;
             --surface: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
             --border: #e2e8f0;
-            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --sidebar-width: 260px;
-            --header-height: 64px;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --transition: all 0.2s ease;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
@@ -65,7 +56,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: var(--background);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             padding: 20px;
         }
 
@@ -76,279 +67,177 @@
 
         .login-title {
             font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
+            font-weight: 700;
+            color: white;
             margin-bottom: 8px;
             text-align: center;
         }
 
         .login-subtitle {
             font-size: 16px;
-            color: var(--text-secondary);
+            color: rgba(255,255,255,0.8);
             margin-bottom: 40px;
             text-align: center;
         }
 
         .login-box {
             background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 40px;
+            border-radius: 16px;
+            padding: 32px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 24px rgb(0 0 0 / 0.08);
+            max-width: 360px;
+            box-shadow: var(--shadow);
         }
 
         .login-box h2 {
             font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             text-align: center;
             color: var(--text-primary);
         }
 
         .login-error {
-            background: #fef2f2;
+            background: #fed7d7;
             color: var(--danger);
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
+            padding: 12px;
+            border-radius: 8px;
             margin-bottom: 16px;
             font-size: 14px;
             display: none;
-            border: 1px solid #fecaca;
         }
 
         /* Main App */
         .app-container {
             display: none;
+            flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary) 100%);
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
-            display: flex;
-            flex-direction: column;
-            z-index: 200;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-brand {
-            padding: 24px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .sidebar-brand-icon {
-            font-size: 32px;
-        }
-
-        .sidebar-brand h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 16px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 199;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
-
-        .top-bar {
-            height: var(--header-height);
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 24px;
+            padding: 20px;
+            text-align: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            gap: 16px;
         }
 
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
+        .app-header h1 {
             font-size: 24px;
-            cursor: pointer;
-            color: var(--text-primary);
-            padding: 8px;
-            border-radius: var(--radius-sm);
-        }
-
-        .hamburger:hover {
-            background: var(--background);
-        }
-
-        .page-content {
-            padding: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .month-nav {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
         }
 
         .month-nav button {
-            background: var(--background);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
             width: 36px;
             height: 36px;
             border-radius: 50%;
             font-size: 18px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
         }
 
         .month-nav button:hover {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            background: rgba(255,255,255,0.3);
         }
 
         .month-nav span {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             min-width: 150px;
-            text-align: center;
-            color: var(--text-primary);
-        }
-
-        .top-bar-spacer {
-            flex: 1;
         }
 
         .logout-btn {
-            background: var(--background);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .logout-btn:hover {
-            background: var(--danger);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
             color: white;
-            border-color: var(--danger);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
         }
 
-        /* Tab Navigation (Sidebar style) */
+        /* Tab Navigation */
         .tab-nav {
-            display: none;
+            display: flex;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab-btn {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
+            flex: 1;
+            min-width: 80px;
+            padding: 14px 8px;
             border: none;
-            background: transparent;
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: var(--radius-sm);
+            background: none;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
             cursor: pointer;
-            transition: var(--transition);
-            text-align: left;
-            width: 100%;
-        }
-
-        .tab-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
         }
 
         .tab-btn.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
         .tab-btn span {
             font-size: 20px;
-            width: 24px;
-            text-align: center;
         }
 
         /* Tab Content */
         .tab-content {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
             display: none;
-            animation: fadeIn 0.2s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* Cards */
         .card {
             background: var(--surface);
-            border-radius: var(--radius-md);
-            padding: 24px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
         }
 
         .card-title {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -358,46 +247,28 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        @media (min-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: var(--surface);
-            border-radius: var(--radius-md);
-            padding: 20px;
+            border-radius: 12px;
+            padding: 16px;
             box-shadow: var(--shadow);
-            border-left: 4px solid var(--primary);
-            transition: var(--transition);
         }
-
-        .stat-card:hover {
-            box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-            transform: translateY(-2px);
-        }
-
-        .stat-card:nth-child(1) { border-left-color: var(--primary); }
-        .stat-card:nth-child(2) { border-left-color: var(--accent); }
-        .stat-card:nth-child(3) { border-left-color: var(--success); }
-        .stat-card:nth-child(4) { border-left-color: var(--warning); }
 
         .stat-label {
             font-size: 12px;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--text-primary);
         }
 
@@ -407,7 +278,7 @@
 
         /* Forms */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
@@ -415,23 +286,23 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .form-control {
             width: 100%;
             padding: 12px 14px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 15px;
-            background: var(--surface);
-            transition: var(--transition);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--background);
+            transition: all 0.2s;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: white;
         }
 
         /* Buttons */
@@ -442,11 +313,11 @@
             gap: 8px;
             padding: 12px 20px;
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
         }
 
         .btn-primary {
@@ -455,8 +326,7 @@
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+            background: var(--primary-light);
         }
 
         .btn-accent {
@@ -464,18 +334,9 @@
             color: white;
         }
 
-        .btn-accent:hover {
-            background: #0d9488;
-            box-shadow: 0 2px 8px rgba(20, 184, 166, 0.35);
-        }
-
         .btn-success {
             background: var(--success);
             color: white;
-        }
-
-        .btn-success:hover {
-            background: #16a34a;
         }
 
         .btn-danger {
@@ -483,20 +344,10 @@
             color: white;
         }
 
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
         .btn-outline {
             background: transparent;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             color: var(--text-primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--background);
-            border-color: var(--primary);
-            color: var(--primary);
         }
 
         .btn-block {
@@ -505,25 +356,24 @@
 
         .btn-sm {
             padding: 8px 14px;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         /* Table */
         .table-container {
             overflow-x: auto;
-            margin: 0 -24px;
-            padding: 0 24px;
+            margin: 0 -20px;
+            padding: 0 20px;
         }
 
         table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
             font-size: 14px;
         }
 
         th, td {
-            padding: 14px 12px;
+            padding: 12px 8px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
@@ -535,26 +385,24 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            position: sticky;
-            top: 0;
         }
 
         tr:hover {
-            background: #f1f5f9;
+            background: var(--background);
         }
 
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 600;
         }
 
-        .status-success { background: #dcfce7; color: #166534; }
-        .status-warning { background: #fef3c7; color: #b45309; }
-        .status-danger { background: #fee2e2; color: #b91c1c; }
-        .status-closed { background: #f1f5f9; color: #475569; }
+        .status-success { background: #c6f6d5; color: #276749; }
+        .status-warning { background: #feebc8; color: #c05621; }
+        .status-danger { background: #fed7d7; color: #c53030; }
+        .status-closed { background: #e2e8f0; color: #4a5568; }
 
         /* Gauge */
         .gauge-container {
@@ -748,8 +596,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -762,30 +609,24 @@
 
         .modal-content {
             background: var(--surface);
-            border-radius: var(--radius-lg);
-            padding: 28px;
+            border-radius: 16px;
+            padding: 24px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             max-height: 80vh;
             overflow-y: auto;
-            animation: slideUp 0.2s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-title {
             font-size: 20px;
             font-weight: 700;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .modal-actions {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            margin-top: 20px;
         }
 
         .modal-actions .btn {
@@ -798,27 +639,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .page-content {
-                padding: 16px;
-            }
-
+        @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -826,11 +647,22 @@
             .associe-details {
                 grid-template-columns: 1fr;
             }
+
+            .tab-btn {
+                min-width: 60px;
+                padding: 10px 4px;
+                font-size: 10px;
+            }
+
+            .tab-btn span {
+                font-size: 18px;
+            }
         }
 
-        @media (min-width: 1200px) {
-            .page-content {
-                max-width: 1100px;
+        @media (min-width: 768px) {
+            .tab-content {
+                max-width: 800px;
+                margin: 0 auto;
             }
         }
 
@@ -851,13 +683,8 @@
             color: white;
         }
 
-        .total-row:hover {
-            background: var(--primary-dark);
-        }
-
         .total-row td {
             font-weight: 700;
-            border-bottom: none;
         }
 
         /* Scrollbar styling */
@@ -898,55 +725,40 @@
 
     <!-- Main App -->
     <div id="appContainer" class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <span class="sidebar-brand-icon">📚</span>
-                <h2>ÉCRILUXE</h2>
+        <header class="app-header">
+            <h1>📚 ÉCRILUXE</h1>
+            <div class="month-nav">
+                <button id="prevMonth">‹</button>
+                <span id="currentMonth">Décembre 2025</span>
+                <button id="nextMonth">›</button>
             </div>
-            <nav class="sidebar-nav">
-                <button class="tab-btn active" data-tab="saisie">
-                    <span>📝</span>
-                    Saisie du jour
-                </button>
-                <button class="tab-btn" data-tab="suivi">
-                    <span>📊</span>
-                    Suivi mensuel
-                </button>
-                <button class="tab-btn" data-tab="salaires">
-                    <span>💰</span>
-                    Salaires
-                </button>
-                <button class="tab-btn" data-tab="dashboard">
-                    <span>📈</span>
-                    Tableau de bord
-                </button>
-                <button class="tab-btn" data-tab="parametres">
-                    <span>⚙️</span>
-                    Paramètres
-                </button>
-            </nav>
-            <div class="sidebar-footer">
-                <button class="btn btn-outline btn-block" id="logoutBtn">Déconnexion</button>
-            </div>
-        </aside>
+            <button class="logout-btn" id="logoutBtn">Déconnexion</button>
+        </header>
 
-        <!-- Overlay for mobile -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="saisie">
+                <span>📝</span>
+                Saisie
+            </button>
+            <button class="tab-btn" data-tab="suivi">
+                <span>📊</span>
+                Suivi
+            </button>
+            <button class="tab-btn" data-tab="salaires">
+                <span>💰</span>
+                Salaires
+            </button>
+            <button class="tab-btn" data-tab="dashboard">
+                <span>📈</span>
+                Tableau
+            </button>
+            <button class="tab-btn" data-tab="parametres">
+                <span>⚙️</span>
+                Paramètres
+            </button>
+        </nav>
 
-        <!-- Main content area -->
-        <div class="main-content">
-            <header class="top-bar">
-                <button class="hamburger" id="hamburgerBtn">☰</button>
-                <div class="month-nav">
-                    <button id="prevMonth">‹</button>
-                    <span id="currentMonth">Décembre 2025</span>
-                    <button id="nextMonth">›</button>
-                </div>
-                <div class="top-bar-spacer"></div>
-            </header>
-
-            <div class="page-content">
         <!-- Tab 1: Saisie -->
         <div id="tabSaisie" class="tab-content active">
             <div class="stats-grid">
@@ -1208,8 +1020,6 @@
                 </button>
             </div>
         </div>
-            </div><!-- end page-content -->
-        </div><!-- end main-content -->
     </div>
 
     <!-- Modal Charge -->
@@ -1422,21 +1232,6 @@
 
             // Confirmation modal
             document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
-
-            // Sidebar toggle (mobile)
-            document.getElementById('hamburgerBtn').addEventListener('click', toggleSidebar);
-            document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
-        }
-
-        // ==================== SIDEBAR ====================
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').classList.remove('active');
         }
 
         // ==================== AUTH ====================
@@ -1482,9 +1277,6 @@
             });
 
             document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-
-            // Close mobile sidebar when switching tabs
-            closeSidebar();
 
             // Update charts when switching to dashboard
             if (tabName === 'dashboard') {
@@ -2086,14 +1878,14 @@
                     datasets: [{
                         label: 'Réalisé',
                         data: data,
-                        borderColor: '#6366f1',
+                        borderColor: '#38a169',
                         backgroundColor: 'rgba(56, 161, 105, 0.1)',
                         fill: true,
                         tension: 0.3
                     }, {
                         label: 'Objectif',
                         data: objectifs,
-                        borderColor: '#14b8a6',
+                        borderColor: '#d69e2e',
                         borderDash: [5, 5],
                         fill: false,
                         tension: 0.3
@@ -2141,7 +1933,7 @@
             }
 
             const averages = totals.map((total, i) => counts[i] > 0 ? Math.round(total / counts[i]) : 0);
-            const colors = averages.map((_, i) => i === appData.settings.jourFermeture ? '#e2e8f0' : '#6366f1');
+            const colors = averages.map((_, i) => i === appData.settings.jourFermeture ? '#e2e8f0' : '#1a365d');
 
             charts.day = new Chart(ctx, {
                 type: 'bar',
@@ -2211,7 +2003,7 @@
                     datasets: [{
                         label: 'Total mensuel',
                         data: data,
-                        backgroundColor: '#14b8a6'
+                        backgroundColor: '#d69e2e'
                     }]
                 },
                 options: {
@@ -2350,7 +2142,7 @@
             const monthName = `${MOIS_NOMS[currentMonth]} ${currentYear}`;
 
             // Header
-            doc.setFillColor(99, 102, 241);
+            doc.setFillColor(26, 54, 93);
             doc.rect(0, 0, 210, 40, 'F');
 
             doc.setTextColor(255, 255, 255);
@@ -2364,7 +2156,7 @@
             let yPos = 55;
 
             // Bénéfices du mois
-            doc.setTextColor(99, 102, 241);
+            doc.setTextColor(26, 54, 93);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Bénéfices du mois', 14, yPos);
@@ -2409,7 +2201,7 @@
             }
 
             // Charges
-            doc.setTextColor(99, 102, 241);
+            doc.setTextColor(26, 54, 93);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Charges du mois', 14, yPos);
@@ -2446,7 +2238,7 @@
             }
 
             // Répartition
-            doc.setTextColor(99, 102, 241);
+            doc.setTextColor(26, 54, 93);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Répartition Salaires & Dividendes', 14, yPos);
