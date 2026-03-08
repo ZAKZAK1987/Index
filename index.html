@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a365d">
+    <meta name="theme-color" content="#6366f1">
     <title>ÉCRILUXE - Gestion Librairie-Papeterie</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -24,24 +25,27 @@
         }
 
         :root {
-            --primary: #1a365d;
-            --primary-light: #2c5282;
-            --primary-dark: #0f2744;
-            --accent: #d69e2e;
-            --accent-light: #ecc94b;
-            --success: #38a169;
-            --warning: #dd6b20;
-            --danger: #e53e3e;
-            --background: #f7fafc;
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --accent: #14b8a6;
+            --accent-light: #2dd4bf;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --background: #f8fafc;
             --surface: #ffffff;
-            --text-primary: #1a202c;
-            --text-secondary: #718096;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
             --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 72px;
+            --header-height: 64px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
@@ -56,7 +60,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: var(--background);
             padding: 20px;
         }
 
@@ -68,14 +72,14 @@
         .login-title {
             font-size: 32px;
             font-weight: 700;
-            color: white;
+            color: var(--primary);
             margin-bottom: 8px;
             text-align: center;
         }
 
         .login-subtitle {
             font-size: 16px;
-            color: rgba(255,255,255,0.8);
+            color: var(--text-secondary);
             margin-bottom: 40px;
             text-align: center;
         }
@@ -86,7 +90,7 @@
             padding: 32px;
             width: 100%;
             max-width: 360px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .login-box h2 {
@@ -97,7 +101,7 @@
         }
 
         .login-error {
-            background: #fed7d7;
+            background: #fef2f2;
             color: var(--danger);
             padding: 12px;
             border-radius: 8px;
@@ -106,117 +110,191 @@
             display: none;
         }
 
-        /* Main App */
+        /* Main App - Sidebar Layout */
         .app-container {
             display: none;
-            flex-direction: column;
             min-height: 100vh;
         }
 
-        .app-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-dark);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
             padding: 20px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand h1 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-btn span {
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 150;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--surface);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        .app-header h1 {
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
             font-size: 24px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            cursor: pointer;
+            padding: 8px;
+            color: var(--text-primary);
         }
 
         .month-nav {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 16px;
-            margin-top: 12px;
         }
 
         .month-nav button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
+            background: var(--background);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
             width: 36px;
             height: 36px;
-            border-radius: 50%;
+            border-radius: 8px;
             font-size: 18px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .month-nav button:hover {
-            background: rgba(255,255,255,0.3);
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         .month-nav span {
             font-size: 16px;
             font-weight: 600;
             min-width: 150px;
+            text-align: center;
+            color: var(--text-primary);
         }
 
-        .logout-btn {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-btn {
+        /* Page Content */
+        .page-content {
             flex: 1;
-            min-width: 80px;
-            padding: 14px 8px;
-            border: none;
-            background: none;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            transition: all 0.2s;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-btn span {
-            font-size: 20px;
+            padding: 24px;
         }
 
         /* Tab Content */
         .tab-content {
-            flex: 1;
-            padding: 20px;
-            padding-bottom: 100px;
             display: none;
         }
 
@@ -228,16 +306,21 @@
         .card {
             background: var(--surface);
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .card-title {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -246,16 +329,35 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
             background: var(--surface);
             border-radius: 12px;
-            padding: 16px;
+            padding: 20px;
             box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card:nth-child(2) {
+            border-left-color: var(--accent);
+        }
+
+        .stat-card:nth-child(3) {
+            border-left-color: var(--success);
+        }
+
+        .stat-card:nth-child(4) {
+            border-left-color: var(--warning);
         }
 
         .stat-label {
@@ -263,11 +365,11 @@
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-value {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-primary);
         }
@@ -362,8 +464,8 @@
         /* Table */
         .table-container {
             overflow-x: auto;
-            margin: 0 -20px;
-            padding: 0 20px;
+            margin: 0 -24px;
+            padding: 0 24px;
         }
 
         table {
@@ -373,22 +475,28 @@
         }
 
         th, td {
-            padding: 12px 8px;
+            padding: 14px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
 
         th {
-            background: var(--background);
+            background: var(--primary);
+            color: white;
             font-weight: 600;
-            color: var(--text-secondary);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
         }
 
-        tr:hover {
+        tbody tr:nth-child(even) {
             background: var(--background);
+        }
+
+        tbody tr:hover {
+            background: rgba(99, 102, 241, 0.05);
         }
 
         .status-badge {
@@ -639,7 +747,29 @@
         }
 
         /* Responsive */
-        @media (max-width: 480px) {
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .hamburger-btn {
+                display: block;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -648,21 +778,14 @@
                 grid-template-columns: 1fr;
             }
 
-            .tab-btn {
-                min-width: 60px;
-                padding: 10px 4px;
-                font-size: 10px;
-            }
-
-            .tab-btn span {
-                font-size: 18px;
+            .page-content {
+                padding: 16px;
             }
         }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1200px) {
             .tab-content {
-                max-width: 800px;
-                margin: 0 auto;
+                max-width: 1000px;
             }
         }
 
@@ -679,12 +802,13 @@
 
         /* Total row styling */
         .total-row {
-            background: var(--primary);
+            background: var(--primary) !important;
             color: white;
         }
 
         .total-row td {
             font-weight: 700;
+            color: white;
         }
 
         /* Scrollbar styling */
@@ -731,48 +855,63 @@
 
     <!-- Main App -->
     <div id="appContainer" class="app-container">
-        <header class="app-header">
-            <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
                 <svg width="40" height="40" viewBox="0 0 150 150">
                     <circle cx="75" cy="75" r="70" fill="#f5e6a3"/>
                     <text x="75" y="75" text-anchor="middle" font-family="'Brush Script MT', cursive" font-size="36" fill="#d4820a" font-weight="bold">E</text>
                 </svg>
                 <h1>ÉCRILUXE</h1>
             </div>
-            <div class="month-nav">
-                <button id="prevMonth">‹</button>
-                <span id="currentMonth">Mars 2026</span>
-                <button id="nextMonth">›</button>
+            <nav class="sidebar-nav">
+                <button class="tab-btn active" data-tab="saisie">
+                    <span>📝</span>
+                    Saisie
+                </button>
+                <button class="tab-btn" data-tab="suivi">
+                    <span>📊</span>
+                    Suivi Mensuel
+                </button>
+                <button class="tab-btn" data-tab="salaires">
+                    <span>💰</span>
+                    Salaires
+                </button>
+                <button class="tab-btn" data-tab="dashboard">
+                    <span>📈</span>
+                    Tableau de Bord
+                </button>
+                <button class="tab-btn" data-tab="parametres">
+                    <span>⚙️</span>
+                    Paramètres
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <span>🚪</span>
+                    Déconnexion
+                </button>
             </div>
-            <button class="logout-btn" id="logoutBtn">Déconnexion</button>
-        </header>
+        </aside>
 
-        <!-- Tab Navigation -->
-        <nav class="tab-nav">
-            <button class="tab-btn active" data-tab="saisie">
-                <span>📝</span>
-                Saisie
-            </button>
-            <button class="tab-btn" data-tab="suivi">
-                <span>📊</span>
-                Suivi
-            </button>
-            <button class="tab-btn" data-tab="salaires">
-                <span>💰</span>
-                Salaires
-            </button>
-            <button class="tab-btn" data-tab="dashboard">
-                <span>📈</span>
-                Tableau
-            </button>
-            <button class="tab-btn" data-tab="parametres">
-                <span>⚙️</span>
-                Paramètres
-            </button>
-        </nav>
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- Tab 1: Saisie -->
-        <div id="tabSaisie" class="tab-content active">
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+                <div class="month-nav">
+                    <button id="prevMonth">‹</button>
+                    <span id="currentMonth">Mars 2026</span>
+                    <button id="nextMonth">›</button>
+                </div>
+                <div></div>
+            </div>
+
+            <div class="page-content">
+                <!-- Tab 1: Saisie -->
+                <div id="tabSaisie" class="tab-content active">
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Objectif du jour</div>
@@ -1030,6 +1169,7 @@
                 <button class="btn btn-danger btn-block" id="resetDataBtn">
                     🗑️ Réinitialiser l'application
                 </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1209,6 +1349,10 @@
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
+            // Sidebar toggle
+            document.getElementById('hamburgerBtn').addEventListener('click', toggleSidebar);
+            document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
+
             // Tab navigation
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => switchTab(btn.dataset.tab));
@@ -1278,6 +1422,21 @@
             renderAll();
         }
 
+        // ==================== SIDEBAR ====================
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
         // ==================== NAVIGATION ====================
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1289,6 +1448,9 @@
             });
 
             document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+
+            // Close sidebar on mobile
+            closeSidebar();
 
             // Update charts when switching to dashboard
             if (tabName === 'dashboard') {
@@ -1890,14 +2052,14 @@
                     datasets: [{
                         label: 'Réalisé',
                         data: data,
-                        borderColor: '#38a169',
-                        backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
                         fill: true,
                         tension: 0.3
                     }, {
                         label: 'Objectif',
                         data: objectifs,
-                        borderColor: '#d69e2e',
+                        borderColor: '#14b8a6',
                         borderDash: [5, 5],
                         fill: false,
                         tension: 0.3
@@ -1945,7 +2107,7 @@
             }
 
             const averages = totals.map((total, i) => counts[i] > 0 ? Math.round(total / counts[i]) : 0);
-            const colors = averages.map((_, i) => i === appData.settings.jourFermeture ? '#e2e8f0' : '#1a365d');
+            const colors = averages.map((_, i) => i === appData.settings.jourFermeture ? '#e2e8f0' : '#6366f1');
 
             charts.day = new Chart(ctx, {
                 type: 'bar',
@@ -2015,7 +2177,7 @@
                     datasets: [{
                         label: 'Total mensuel',
                         data: data,
-                        backgroundColor: '#d69e2e'
+                        backgroundColor: '#14b8a6'
                     }]
                 },
                 options: {
@@ -2154,7 +2316,7 @@
             const monthName = `${MOIS_NOMS[currentMonth]} ${currentYear}`;
 
             // Header
-            doc.setFillColor(26, 54, 93);
+            doc.setFillColor(99, 102, 241);
             doc.rect(0, 0, 210, 40, 'F');
 
             doc.setTextColor(255, 255, 255);
@@ -2168,7 +2330,7 @@
             let yPos = 55;
 
             // Bénéfices du mois
-            doc.setTextColor(26, 54, 93);
+            doc.setTextColor(99, 102, 241);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Bénéfices du mois', 14, yPos);
@@ -2200,7 +2362,7 @@
                 head: [['Date', 'Jour', 'Objectif', 'Réalisé']],
                 body: tableData,
                 theme: 'striped',
-                headStyles: { fillColor: [26, 54, 93] },
+                headStyles: { fillColor: [99, 102, 241] },
                 margin: { left: 14, right: 14 }
             });
 
@@ -2213,7 +2375,7 @@
             }
 
             // Charges
-            doc.setTextColor(26, 54, 93);
+            doc.setTextColor(99, 102, 241);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Charges du mois', 14, yPos);
@@ -2230,7 +2392,7 @@
                     head: [['Libellé', 'Montant']],
                     body: chargesData,
                     theme: 'striped',
-                    headStyles: { fillColor: [26, 54, 93] },
+                    headStyles: { fillColor: [99, 102, 241] },
                     margin: { left: 14, right: 14 }
                 });
 
@@ -2250,7 +2412,7 @@
             }
 
             // Répartition
-            doc.setTextColor(26, 54, 93);
+            doc.setTextColor(99, 102, 241);
             doc.setFontSize(16);
             doc.setFont(undefined, 'bold');
             doc.text('Répartition Salaires & Dividendes', 14, yPos);
@@ -2308,7 +2470,7 @@
                 head: [['Associé', 'Capital', 'Part', 'Salaire', 'Dividendes', 'Total']],
                 body: repartitionData,
                 theme: 'striped',
-                headStyles: { fillColor: [26, 54, 93] },
+                headStyles: { fillColor: [99, 102, 241] },
                 margin: { left: 14, right: 14 },
                 columnStyles: {
                     0: { cellWidth: 30 },
